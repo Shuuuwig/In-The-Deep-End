@@ -1,16 +1,31 @@
-using UnityEngine;
+using System;
 
-public class InfoEventArgs : MonoBehaviour
+public class InfoEventArgs<T> : EventArgs
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public T info;
+
+    public InfoEventArgs()
     {
-        
+        info = default;
     }
 
-    // Update is called once per frame
-    void Update()
+    public InfoEventArgs(T info)
     {
-        
+        this.info = info;
+    }
+}
+
+public class InfoEventArgs<T, T2> : EventArgs
+{
+    public T info;
+    public T info2;
+    public InfoEventArgs()
+    {
+        info = default;
+    }
+    public InfoEventArgs(T info, T info2)
+    {
+        this.info = info;
+        this.info2 = info2;
     }
 }
