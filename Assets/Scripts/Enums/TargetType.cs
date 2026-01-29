@@ -4,8 +4,7 @@ public enum TargetType
 {
     Self,
     Single,
-    MultiFree,
-    DoubleBurst,
-    TripleBurst,
-    QuadrupleBurst
+    MultiSingle,
+    Burst,
+    FullAOE,
 }
