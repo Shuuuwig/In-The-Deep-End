@@ -6,7 +6,7 @@ public class BattleData : ScriptableObject
 {
     public int RoundLength;
     public int NumberOfWaves;
-    public List<GameObject> ActivePlayerUnits = new List<GameObject>(4);
-    public List<GameObject> ActiveEnemyUnits = new List<GameObject>(4);
+    public List<GameObject> PlayerUnitsInBattle = new List<GameObject>();
+    public List<GameObject> EnemyUnitsInBattle = new List<GameObject>();
 
 }

@@ -1,16 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 
-public class RoomData : MonoBehaviour
+[CreateAssetMenu(fileName = "RoomData", menuName = "ScriptableObjects / RoomData")]
+public class RoomData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public RoomType RoomType;
+    public string RoomName;
+    public Sprite RoomIcon;
 }

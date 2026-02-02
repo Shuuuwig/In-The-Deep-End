@@ -11,7 +11,7 @@ public class ActionData : ScriptableObject
     [Range(0, 3)] public int TargetableBack;
     [Range(0, 100)] public int Accuracy;
     [Range(0, 10)] public int MaxActionCount;
-    public BattleData BattleValues;
+    public BattleData BattleData;
     public TargetType TargetType;
     public ActionType ActionType;
     
