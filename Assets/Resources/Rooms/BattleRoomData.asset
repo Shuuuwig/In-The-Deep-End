@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd5674425aa8a21438f174b685193099, type: 3}
-  m_Name: CombatRoomData
+  m_Name: BattleRoomData
   m_EditorClassIdentifier: Assembly-CSharp::RoomData
   RoomType: 0
-  RoomName: Combat Room
+  RoomName: Battle Room
   RoomIcon: {fileID: 0}

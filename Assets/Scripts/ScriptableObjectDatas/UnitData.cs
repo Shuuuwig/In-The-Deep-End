@@ -1,16 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitData : MonoBehaviour
+[CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects / UnitData")]
+public class UnitData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public float MaxHealthPoints;
+    public float MaxResolvePoints;
+    public float CurrentHealthPoints;
+    public float CurrentResolvePoints;
+    public float BaseSpeed;
+    public float BaseDamage;
+    public List<Sprite> MarkedTargetIndicatorSprites;
 }

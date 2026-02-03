@@ -13,12 +13,13 @@ public class RoomInfo : MonoBehaviour
         name = RoomData.RoomName;
 
         RoomHandler roomHandler = FindAnyObjectByType<RoomHandler>();
-        
+        MapHandler mapHandler = FindAnyObjectByType<MapHandler>();
+
         if (roomHandler != null)
         {
             GetComponent<Button>().onClick.AddListener(() => roomHandler.GoToRoom(RoomData));
+            GetComponent<Button>().onClick.AddListener(() => mapHandler.DetermineCurrentPosition());
             GetComponentInChildren<TMP_Text>().text = name;
         }
-            
     }
 }

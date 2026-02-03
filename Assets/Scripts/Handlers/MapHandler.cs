@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor.SceneManagement;
 using UnityEngine.LightTransport;
+using System.Linq;
 
 public class MapHandler : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class MapHandler : MonoBehaviour
     [SerializeField] float _noiseScale = 0.2f;
     float _xOffset;
     float _yOffset;
+    int? _currentRow;
+    MapData _mapData;
 
     void Start()
     {
@@ -30,6 +33,11 @@ public class MapHandler : MonoBehaviour
 
     void GenerateMap()
     {
+        if (_mapData != null)
+        {           
+            return;
+        }
+
         if (_masterSeed == 0)
             _masterSeed = Random.Range(1, 1000000);
 
@@ -40,7 +48,7 @@ public class MapHandler : MonoBehaviour
 
         for (int currentRow = 0; currentRow < _rows.Count; currentRow++)
         {
-            int numOfRooms = NumberOfRoomsInRow(currentRow);
+            int numOfRooms = GenerateNumberOfRooms(currentRow);
 
             for (int room = 0; room < numOfRooms; room++)
             {
@@ -49,10 +57,11 @@ public class MapHandler : MonoBehaviour
             }
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rows[currentRow]);
+            DetermineCurrentPosition();
         }
     }
 
-    int NumberOfRoomsInRow(int currentRow)
+    int GenerateNumberOfRooms(int currentRow)
     {
         if (currentRow == 0)
             return Random.Range(2, 4);
@@ -88,5 +97,22 @@ public class MapHandler : MonoBehaviour
 
         RoomInfo roomInfo = newRoom.GetComponent<RoomInfo>();
         roomInfo.RoomSetup(roomData);
+    }
+
+    public void DetermineCurrentPosition()
+    {
+        if (_currentRow == null)
+            _currentRow = 0;
+        else
+            _currentRow++;
+
+        Button[] selectableRooms = _rows[(int)_currentRow].GetComponentsInChildren<Button>();
+
+        for (int room = 0; room < selectableRooms.Length; room++)
+        {
+            selectableRooms[room].enabled = true;
+
+
+        }
     }
 }
