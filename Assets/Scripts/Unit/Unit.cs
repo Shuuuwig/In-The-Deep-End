@@ -1,26 +1,21 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Events;
 
 public abstract class Unit : MonoBehaviour
 {
-    [Header("Scriptable Object References")]
+    [Header("Unit Data")]
     [SerializeField] protected UnitData _unitData;
-    [SerializeField] protected BattleData _battleData;
-    [SerializeField] protected List<ActionData> _actionDataSO;
+    protected List<ActionData> _actionDatas { get { return _unitData.ActionDatas; }}
     protected Dictionary<UnityAction, ActionData> _moveset = new Dictionary<UnityAction, ActionData>();
 
-    public UnitData UnitData { get { return _unitData; } }
-    public Dictionary<UnityAction, ActionData> Moveset { get { return _moveset; } }
-
+    [Header("Component References")]
     [SerializeField] protected AudioSource _audioSource;
     [SerializeField] protected List<AudioClip> _audioClips;
     [SerializeField] protected Animator _animator;
     [SerializeField] protected List<AnimationClip> _animationClips;
-
-    public AudioSource AudioSource { get { return _audioSource; } }
-    public Animator Animator { get { return _animator; } }
 
     protected int _maxActionCount;
     protected float _baseTurnValue;
@@ -62,7 +57,7 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void CalculateBaseTurnValue()
     {
-        _baseTurnValue = _battleData.RoundLength / BaseSpeed;
+        
     }
 
     public virtual void ResetActionCount()
