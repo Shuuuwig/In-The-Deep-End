@@ -1,56 +1,49 @@
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine;
-<<<<<<< Updated upstream
-using UnityEditor.SceneManagement;
-using UnityEngine.LightTransport;
-using System.Linq;
-=======
 using System.Collections;
->>>>>>> Stashed changes
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class MapHandler : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("Horizontal Rows")]
     [SerializeField] List<RectTransform> _rows = new List<RectTransform>();
-    [SerializeField] private ScrollRect _scrollRect;
 
-    [Header("Room Select Prefab")]
+    [Header("Room Prefabs & Data")]
     [SerializeField] GameObject _roomSelectionPrefab;
-
-    [Header("Room Data")]
     [SerializeField] RoomData _combatData;
     [SerializeField] RoomData _eventData;
     [SerializeField] RoomData _restData;
 
-    [Header("Map Configuration")]
+    [Header("Map Generation Settings")]
     [SerializeField] int _masterSeed;
     [SerializeField] float _noiseScale = 0.2f;
     [SerializeField][Range(0, 1)] float _combatRoomSpawnChance = 0.7f;
     [SerializeField][Range(0, 1)] float _eventRoomSpawnChance = 0.25f;
-    [SerializeField][Range(0, 1)] float _extraPathChance = 0.3f;
+    [Range(0f, 1f)][SerializeField] float _extraPathChance = 0.3f;
 
-    float _xOffset;
-    float _yOffset;
-    int? _currentRow;
-    MapData _mapData;
+    [Header("Path Rendering")]
+    [SerializeField] GameObject _linePrefab;
+    [SerializeField] RectTransform _lineParent;
+    [SerializeField] ScrollRect _scrollRect;
 
-    [Header("Path Settings")]
-    [SerializeField] private GameObject _linePrefab;
-    [SerializeField] private RectTransform _lineParent;
+    private float _xOffset;
+    private float _yOffset;
 
     void Start()
     {
         StartCoroutine(GenerateMapRoutine());
     }
 
+    private void OnValidate()
+    {
+        if (_combatRoomSpawnChance + _eventRoomSpawnChance > 1f)
+        {
+            _eventRoomSpawnChance = 1f - _combatRoomSpawnChance;
+        }
+    }
+
     IEnumerator GenerateMapRoutine()
     {
-        if (_mapData != null)
-        {           
-            return;
-        }
-
         if (_masterSeed == 0)
             _masterSeed = Random.Range(1, 1000000);
 
@@ -61,15 +54,12 @@ public class MapHandler : MonoBehaviour
 
         for (int currentRow = 0; currentRow < _rows.Count; currentRow++)
         {
-            int numOfRooms = GenerateNumberOfRooms(currentRow);
-
-            for (int room = 0; room < numOfRooms; room++)
+            int numOfRooms = NumberOfRoomsInRow(currentRow);
+            for (int r = 0; r < numOfRooms; r++)
             {
                 SpawnRoomSelection(RandomizeRoomData(currentRow), currentRow);
             }
-
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rows[currentRow]);
-            DetermineCurrentPosition();
         }
 
         if (_scrollRect != null)
@@ -124,62 +114,78 @@ public class MapHandler : MonoBehaviour
 
     List<RoomInfo> GetNearestRooms(RoomInfo currentRoom, RoomInfo[] connectableRooms)
     {
-        RoomInfo closestRoom = null;
-        RoomInfo secondClosestRoom = null;
-        float minDistance = float.MaxValue;
-        float secondMinDistance = float.MaxValue;
+        RoomInfo closest = null;
+        RoomInfo second = null;
+        float min = float.MaxValue;
+        float secondMin = float.MaxValue;
 
-        foreach (RoomInfo nextRoom in connectableRooms)
+        foreach (RoomInfo next in connectableRooms)
         {
-            float distance = (currentRoom.transform.position - nextRoom.transform.position).sqrMagnitude;
-
-            if (distance < minDistance)
+            float dist = (currentRoom.transform.position - next.transform.position).sqrMagnitude;
+            if (dist < min)
             {
-                secondMinDistance = minDistance;
-                secondClosestRoom = closestRoom;
-
-                minDistance = distance;
-                closestRoom = nextRoom;
+                secondMin = min;
+                second = closest;
+                min = dist;
+                closest = next;
             }
-            else if (distance < secondMinDistance)
+            else if (dist < secondMin)
             {
-                secondMinDistance = distance;
-                secondClosestRoom = nextRoom;
+                secondMin = dist;
+                second = next;
             }
         }
 
         List<RoomInfo> results = new List<RoomInfo>();
-        if (closestRoom != null)
-            results.Add(closestRoom);
-        if (secondClosestRoom != null)
-            results.Add(secondClosestRoom);
+        if (closest != null)
+            results.Add(closest);
+        if (second != null)
+            results.Add(second);
 
         return results;
     }
 
-    int GenerateNumberOfRooms(int currentRow)
+    void DrawLine(RectTransform start, RectTransform end)
+    {
+        GameObject lineObj = Instantiate(_linePrefab, _lineParent);
+        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+
+        Vector2 direction = end.position - start.position;
+        lineRect.position = start.position + (Vector3)(direction / 2f);
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        lineRect.rotation = Quaternion.Euler(0, 0, angle);
+        lineRect.sizeDelta = new Vector2(direction.magnitude, 15f);
+
+        lineObj.transform.SetAsFirstSibling();
+    }
+
+    int NumberOfRoomsInRow(int currentRow)
     {
         if (currentRow == 0)
             return Random.Range(2, 4);
         if (currentRow == _rows.Count - 1)
             return 1;
 
-        float noiseValue = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
-        if (noiseValue > 0.5f)
+        float noise = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
+
+        if (noise > 0.5)
             return Random.Range(2, 4);
 
         return Random.Range(1, 3);
     }
 
-    RoomData RandomizeRoomData(int currentRow)
+    RoomData RandomizeRoomData(int i)
     {
-        if (currentRow == 0 || currentRow == _rows.Count - 1)
+        if (i == 0 || i == _rows.Count - 1)
             return _combatData;
 
         float randomValue = Random.value;
+
         if (randomValue < _combatRoomSpawnChance)
             return _combatData;
-        if (randomValue < _combatRoomSpawnChance + _eventRoomSpawnChance)
+
+        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance))
             return _eventData;
 
         return _restData;
@@ -191,46 +197,9 @@ public class MapHandler : MonoBehaviour
         newRoom.GetComponent<RoomInfo>().RoomSetup(roomData);
     }
 
-    private void DrawLine(RectTransform start, RectTransform end)
-    {
-        GameObject lineObj = Instantiate(_linePrefab, _lineParent);
-        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
-
-        Vector2 direction = end.position - start.position;
-        lineRect.position = start.position + (Vector3)(direction / 2);
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        lineRect.rotation = Quaternion.Euler(0, 0, angle);
-        lineRect.sizeDelta = new Vector2(direction.magnitude, 15f);
-    }
-
     void SnapToBottom()
     {
-        _scrollRect.verticalNormalizedPosition = 0f;
-    }
-
-    void OnValidate()
-    {
-        if (_combatRoomSpawnChance + _eventRoomSpawnChance > 1f)
-        {
-            _eventRoomSpawnChance = 1f - _combatRoomSpawnChance;
-        }
-    }
-
-    public void DetermineCurrentPosition()
-    {
-        if (_currentRow == null)
-            _currentRow = 0;
-        else
-            _currentRow++;
-
-        Button[] selectableRooms = _rows[(int)_currentRow].GetComponentsInChildren<Button>();
-
-        for (int room = 0; room < selectableRooms.Length; room++)
-        {
-            selectableRooms[room].enabled = true;
-
-
-        }
+        if (_scrollRect != null)
+            _scrollRect.verticalNormalizedPosition = 0f;
     }
 }

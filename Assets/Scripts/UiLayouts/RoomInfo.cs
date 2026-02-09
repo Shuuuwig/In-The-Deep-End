@@ -18,7 +18,6 @@ public class RoomInfo : MonoBehaviour
         if (roomHandler != null)
         {
             GetComponent<Button>().onClick.AddListener(() => roomHandler.GoToRoom(RoomData));
-            GetComponent<Button>().onClick.AddListener(() => mapHandler.DetermineCurrentPosition());
             GetComponentInChildren<TMP_Text>().text = name;
         }
     }
