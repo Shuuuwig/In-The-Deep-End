@@ -153,7 +153,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.0018311}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 800, y: 450.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &297779224
@@ -419,7 +419,7 @@ MonoBehaviour:
   - {fileID: 1124496095}
   - {fileID: 1059872933}
   - {fileID: 495270794}
-  _scrollRect: {fileID: 297779224}
+  _roomHandler: {fileID: 0}
   _roomSelectionPrefab: {fileID: 3761602012796187840, guid: 522361dc0432c1747919fd51c286ea21, type: 3}
   _combatData: {fileID: 11400000, guid: 425e86421ed487c4190cfd4cae06abcb, type: 2}
   _eventData: {fileID: 11400000, guid: 8db239c7c000d4040bd5ce06b35187d2, type: 2}
@@ -431,6 +431,7 @@ MonoBehaviour:
   _extraPathChance: 0.3
   _linePrefab: {fileID: 908677606806369841, guid: 52a3aac15455f024d9b013b55f11ea22, type: 3}
   _lineParent: {fileID: 632439500}
+  _scrollRect: {fileID: 297779224}
 --- !u!1 &1059872932
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +649,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.0014496}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 800, y: 450.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1231582921

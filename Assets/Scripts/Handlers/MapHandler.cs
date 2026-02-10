@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,7 @@ public class MapHandler : MonoBehaviour
     [SerializeField] List<RectTransform> _rows = new List<RectTransform>();
 
     [Header("Room Prefabs & Data")]
+    [SerializeField] RoomHandler _roomHandler;
     [SerializeField] GameObject _roomSelectionPrefab;
     [SerializeField] RoomData _combatData;
     [SerializeField] RoomData _eventData;
@@ -26,15 +28,28 @@ public class MapHandler : MonoBehaviour
     [SerializeField] RectTransform _lineParent;
     [SerializeField] ScrollRect _scrollRect;
 
-    private float _xOffset;
-    private float _yOffset;
+    float _xOffset;
+    float _yOffset;
+    string _currentRowPref = "CurrentRowOnMap";
+    string _currentMapSeedPref = "CurrentMapSeed";
+    string _currentMapIDPref = "CurrentMapID";
 
     void Start()
     {
+        if (PlayerPrefs.HasKey(_currentMapSeedPref))
+        {
+            _masterSeed = PlayerPrefs.GetInt(_currentMapSeedPref);
+        }
+        else
+        {
+            _masterSeed = Random.Range(1, 1000000);
+            PlayerPrefs.SetInt(_currentMapSeedPref, _masterSeed);
+        }
+
         StartCoroutine(GenerateMapRoutine());
     }
 
-    private void OnValidate()
+    void OnValidate()
     {
         if (_combatRoomSpawnChance + _eventRoomSpawnChance > 1f)
         {
@@ -55,7 +70,7 @@ public class MapHandler : MonoBehaviour
         for (int currentRow = 0; currentRow < _rows.Count; currentRow++)
         {
             int numOfRooms = NumberOfRoomsInRow(currentRow);
-            for (int r = 0; r < numOfRooms; r++)
+            for (int room = 0; room < numOfRooms; room++)
             {
                 SpawnRoomSelection(RandomizeRoomData(currentRow), currentRow);
             }
@@ -68,6 +83,7 @@ public class MapHandler : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         GeneratePaths();
+        ManageInitialSelections();
         SnapToBottom();
     }
 
@@ -145,6 +161,89 @@ public class MapHandler : MonoBehaviour
         return results;
     }
 
+    public void ManageInitialSelections()
+    {
+        int savedRow = PlayerPrefs.GetInt(_currentRowPref, -1);
+        int savedRoomID = PlayerPrefs.GetInt(_currentMapIDPref, -1);
+
+        for (int row = 0; row < _rows.Count; row++)
+        {
+            RoomInfo[] roomsInRow = _rows[row].GetComponentsInChildren<RoomInfo>();
+
+            foreach (RoomInfo room in roomsInRow)
+            {
+                if (savedRow == -1)
+                {
+                    room.SetInteractable(row == 0);
+                }
+                else
+                {
+                    if (row == savedRow && room.transform.GetSiblingIndex() == savedRoomID)
+                    {
+                        foreach (RoomInfo nextRoom in room.NextConnectedRooms)
+                        {
+                            nextRoom.SetInteractable(true);
+                        }
+                    }
+                    else
+                    {
+                        room.SetInteractable(false);
+                    }
+                }
+            }
+        }
+    }
+
+    public void EnterRoom(RoomInfo selectedRoom)
+    {
+        int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
+
+        if (roomRowIndex == _rows.Count - 1)
+            ResetMapProgress();
+
+        PlayerPrefs.SetInt(_currentRowPref, roomRowIndex);
+        PlayerPrefs.SetInt(_currentMapIDPref, selectedRoom.transform.GetSiblingIndex());
+        PlayerPrefs.Save();
+
+        foreach (RectTransform row in _rows)
+        {
+            RoomInfo[] rooms = row.GetComponentsInChildren<RoomInfo>();
+            foreach (RoomInfo room in rooms)
+            {
+                room.SetInteractable(false);
+            }
+        }
+
+        foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
+        {
+            nextRoom.SetInteractable(true);
+        }
+    }
+
+    public void ResetMapProgress()
+    {
+        _masterSeed = 0;
+
+        PlayerPrefs.DeleteKey(_currentMapSeedPref);
+        PlayerPrefs.DeleteKey(_currentRowPref);
+        PlayerPrefs.DeleteKey(_currentMapIDPref);
+        PlayerPrefs.Save();
+    }
+
+    void StoreRoomPaths(RectTransform start, RectTransform end)
+    {
+        RoomInfo startRoom = start.GetComponent<RoomInfo>();
+        RoomInfo endRoom = end.GetComponent<RoomInfo>();
+
+        if (startRoom && endRoom != null)
+        {
+            if (!startRoom.NextConnectedRooms.Contains(endRoom))
+            {
+                startRoom.NextConnectedRooms.Add(endRoom);
+            }
+        }
+    }
+
     void DrawLine(RectTransform start, RectTransform end)
     {
         GameObject lineObj = Instantiate(_linePrefab, _lineParent);
@@ -158,6 +257,7 @@ public class MapHandler : MonoBehaviour
         lineRect.sizeDelta = new Vector2(direction.magnitude, 15f);
 
         lineObj.transform.SetAsFirstSibling();
+        StoreRoomPaths(start, end);
     }
 
     int NumberOfRoomsInRow(int currentRow)
@@ -194,7 +294,7 @@ public class MapHandler : MonoBehaviour
     void SpawnRoomSelection(RoomData roomData, int row)
     {
         GameObject newRoom = Instantiate(_roomSelectionPrefab, _rows[row]);
-        newRoom.GetComponent<RoomInfo>().RoomSetup(roomData);
+        newRoom.GetComponent<RoomInfo>().RoomSetup(roomData, this, _roomHandler);
     }
 
     void SnapToBottom()

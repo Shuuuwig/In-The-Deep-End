@@ -1,24 +1,38 @@
-using Microsoft.Unity.VisualStudio.Editor;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class RoomInfo : MonoBehaviour
 {
-    RoomData RoomData;
+    [SerializeField] Button _roomButton;
+    RoomData _roomData;
+    public List<RoomInfo> NextConnectedRooms = new List<RoomInfo>();
 
-    public void RoomSetup(RoomData data)
+    public void RoomSetup(RoomData roomData, MapHandler mapHandler, RoomHandler roomHandler)
     {
-        RoomData = data;
-        name = RoomData.RoomName;
+        _roomData = roomData;
+        name = _roomData.RoomName;
+        
+        if (_roomButton == null)
+            _roomButton = GetComponent<Button>();
 
-        RoomHandler roomHandler = FindAnyObjectByType<RoomHandler>();
-        MapHandler mapHandler = FindAnyObjectByType<MapHandler>();
+        _roomButton.onClick.RemoveAllListeners();
 
         if (roomHandler != null)
-        {
-            GetComponent<Button>().onClick.AddListener(() => roomHandler.GoToRoom(RoomData));
-            GetComponentInChildren<TMP_Text>().text = name;
-        }
+            _roomButton.onClick.AddListener(() => roomHandler.GoToRoom(_roomData));
+
+        if (mapHandler != null)
+            _roomButton.onClick.AddListener(() => mapHandler.EnterRoom(this));
+
+        TMP_Text displayName = GetComponentInChildren<TMP_Text>();
+        if (displayName != null)
+            displayName.text = name;
+    }
+
+    public void SetInteractable(bool state)
+    {
+        if (_roomButton != null)
+            _roomButton.interactable = state;
     }
 }
