@@ -20,6 +20,11 @@ public abstract class Unit : MonoBehaviour
     protected int _maxActionCount;
     protected float _baseTurnValue;
 
+    public UnitData UnitData { get { return _unitData; } }
+    public Dictionary<UnityAction, ActionData> Moveset { get { return _moveset; } }
+    public AudioSource AudioSource { get { return _audioSource; } }
+    public Animator Animator { get { return _animator; } }
+
     public float MaxHealthPoints { get { return _unitData.MaxHealthPoints; } }
     public float MaxResolvePoints { get { return _unitData.MaxResolvePoints; } }
     public float BaseSpeed { get { return _unitData.BaseSpeed; } }
@@ -84,6 +89,5 @@ public abstract class Unit : MonoBehaviour
             IsDead = true;
             gameObject.SetActive(false);
         }
-
     }
 }

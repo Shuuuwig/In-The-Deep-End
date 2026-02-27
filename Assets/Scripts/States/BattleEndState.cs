@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BattleEndState : MonoBehaviour
+public class BattleEndState : TurnState
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

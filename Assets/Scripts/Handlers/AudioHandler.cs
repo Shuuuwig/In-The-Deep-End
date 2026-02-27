@@ -1,16 +1,11 @@
 using UnityEngine;
 
-public class AudioHandler : MonoBehaviour
+public static class AudioHandler
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static void PlaySound(AudioSource audioSource, AudioClip audioClip)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        audioSource.Stop();
+        audioSource.clip = audioClip;
+        audioSource.Play();      
     }
 }

@@ -1,16 +1,41 @@
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Events;
 
-public class PlanState : MonoBehaviour
+public class PlanState : TurnState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected void Awake()
     {
-        
+        InitializeReferences();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Enter()
     {
-        
+        base.Enter();
+        Debug.Log("Enter PlanState");
+        LoadSelections();
+    }
+
+    protected override void InitializeReferences()
+    {
+        base.InitializeReferences();
+    }
+
+    protected virtual void LoadSelections()
+    {
+        //Reference menu handler
+        //Initialize selections with personal unit data
+        //Instantiate option slots or hard cap at certain number
+        //Perhaps more states needed for sub-options? (player side)
+    }
+
+    protected virtual void SelectionChosen()
+    {
+        //Menu selection
+        //Fight, Skip/Rest, Item? etc.
+        //Each selection most likely hard coded to do their own thing
+        //Move between states for menu navigation or handle all here
+        //End after acting (unless special circumstance)
+
     }
 }

@@ -1,16 +1,9 @@
 using UnityEngine;
 
-public class AnimationHandler1 : MonoBehaviour
+public class AnimationHandler
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static void PlayAnimation(Animator animator, AnimationClip animationClip)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        animator.Play(animationClip.name);
     }
 }

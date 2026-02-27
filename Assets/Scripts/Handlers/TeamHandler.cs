@@ -1,16 +1,15 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TeamHandler : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    protected TeamData _teamData;
+    protected List<GameObject> UnitSlots = new List<GameObject>(); //insert unit to gameobject
+    protected Unit SelectedUnit1;
+    protected Unit SelectedUnit2;
+    protected Unit SelectedUnit3;
+    protected Unit SelectedUnit4;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
