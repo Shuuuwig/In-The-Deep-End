@@ -13,9 +13,6 @@ public class InitialGameState : TurnState
 
     protected override void TurnTransition()
     {
-        _turnController.AssignReference();
-        _turnController.InitializeActiveUnits();
-        _turnController.InitialTurnValue();
-        _turnController.DetermineTurn();
+
     }
 }

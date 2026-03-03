@@ -10,7 +10,7 @@ public class CombatUIHandler : MonoBehaviour
 {
     [SerializeField] protected BattleData _battleData;
     [SerializeField] protected TurnHandler _turnHandler;
-    [SerializeField] protected CombatHandler _combatHandler;
+    [SerializeField] protected CombatFunctions _combatHandler;
     protected ActionData _targetTypeData;
 
     [SerializeField] protected GameObject _actionPanel;

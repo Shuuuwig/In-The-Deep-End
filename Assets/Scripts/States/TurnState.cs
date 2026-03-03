@@ -5,7 +5,7 @@ using UnityEngine;
 public class TurnState : State
 {
     protected TurnHandler _turnController;
-    protected CombatHandler _combatHandler;
+    protected CombatFunctions CombatFunctions;
     protected CombatUIHandler _combatUIHandler;
     protected List<Unit> _activeUnits { get { return _turnController.ActiveUnits; } }
     protected Unit _currentActiveUnit { get { return _turnController.CurrentActiveUnit; } }
@@ -21,8 +21,8 @@ public class TurnState : State
         if (_turnController == null)
             _turnController = FindAnyObjectByType<TurnHandler>();
 
-        if (_combatHandler == null)
-            _combatHandler = FindAnyObjectByType<CombatHandler>();
+        if (CombatFunctions == null)
+            CombatFunctions = FindAnyObjectByType<CombatFunctions>();
 
         if (_combatUIHandler == null)
             _combatUIHandler = FindAnyObjectByType<CombatUIHandler>();

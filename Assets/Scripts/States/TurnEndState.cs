@@ -10,9 +10,9 @@ public class TurnEndState : TurnState
 
         _combatUIHandler.ResetSelectedTargets();
 
-        _combatHandler.ClearAction();
-        _combatHandler.StatusCheck();
-        _combatHandler.ClearSelectedTargets();
+        CombatFunctions.ClearAction();
+        CombatFunctions.StatusCheck();
+        CombatFunctions.ClearSelectedTargets();
 
         TurnTransition();
     }

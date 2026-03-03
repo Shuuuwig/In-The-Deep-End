@@ -12,6 +12,7 @@ public class MapHandler : MonoBehaviour
     [Header("Room Prefabs & Data")]
     [SerializeField] RoomHandler _roomHandler;
     [SerializeField] GameObject _roomSelectionPrefab;
+    [SerializeField] MapData _mapData;
     [SerializeField] RoomData _combatData;
     [SerializeField] RoomData _eventData;
     [SerializeField] RoomData _restData;
@@ -33,6 +34,7 @@ public class MapHandler : MonoBehaviour
     string _currentRowPref = "CurrentRowOnMap";
     string _currentMapSeedPref = "CurrentMapSeed";
     string _currentMapIDPref = "CurrentMapID";
+    string _currentMapLastRowPref = "CurrentLastRowOnMap";
 
     void Start()
     {
@@ -46,6 +48,7 @@ public class MapHandler : MonoBehaviour
             PlayerPrefs.SetInt(_currentMapSeedPref, _masterSeed);
         }
 
+        PlayerPrefs.SetInt(_currentMapLastRowPref, _rows.Count - 1);
         StartCoroutine(GenerateMapRoutine());
     }
 
@@ -224,6 +227,8 @@ public class MapHandler : MonoBehaviour
     {
         _masterSeed = 0;
 
+        _mapData.CurrentRow = 0;
+
         PlayerPrefs.DeleteKey(_currentMapSeedPref);
         PlayerPrefs.DeleteKey(_currentRowPref);
         PlayerPrefs.DeleteKey(_currentMapIDPref);
@@ -275,9 +280,9 @@ public class MapHandler : MonoBehaviour
         return Random.Range(1, 3);
     }
 
-    RoomData RandomizeRoomData(int i)
+    RoomData RandomizeRoomData(int row)
     {
-        if (i == 0 || i == _rows.Count - 1)
+        if (row == 0 || row == _rows.Count - 1)
             return _combatData;
 
         float randomValue = Random.value;
@@ -294,7 +299,7 @@ public class MapHandler : MonoBehaviour
     void SpawnRoomSelection(RoomData roomData, int row)
     {
         GameObject newRoom = Instantiate(_roomSelectionPrefab, _rows[row]);
-        newRoom.GetComponent<RoomInfo>().RoomSetup(roomData, this, _roomHandler);
+        newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this, _roomHandler);
     }
 
     void SnapToBottom()

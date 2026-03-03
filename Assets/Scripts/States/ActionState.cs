@@ -25,20 +25,20 @@ public class ActionState : TurnState
     protected IEnumerator HandleActions() // Ienumerator later
     {
         // handle damage, heal, buff and countermeasures for opposing side as well
-        ActionData actionDataUsed = _currentActiveUnit.Moveset[_combatHandler.ActionUsed];
+        ActionData actionDataUsed = _currentActiveUnit.Moveset[CombatFunctions.ActionUsed];
         Debug.Log(actionDataUsed);
-        if (_combatHandler.IsDamaging(actionDataUsed.ActionType))
+        if (CombatFunctions.IsDamaging(actionDataUsed.ActionType))
         {
             Debug.Log("IsDamaging");
-            StartCoroutine(_combatHandler.Damage());
-            _combatHandler.StatusCheck();
+            StartCoroutine(CombatFunctions.Damage());
+            CombatFunctions.StatusCheck();
         }
         else
         {
-            StartCoroutine(_combatHandler.Buff());
+            StartCoroutine(CombatFunctions.Buff());
         }
 
-        yield return new WaitUntil(() => !_combatHandler.HandlingAction);
+        yield return new WaitUntil(() => !CombatFunctions.HandlingAction);
         _turnController.ChangeState<TurnEndState>();
     }
 

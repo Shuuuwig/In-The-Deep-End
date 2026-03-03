@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 522f3ff48d7bef647a19c166448f55c7, type: 3}
-  m_Name: BattleData1
-  m_EditorClassIdentifier: Assembly-CSharp::BattleData
-  RoundLength: 200
-  NumberOfWaves: 1
-  PlayerUnitsInBattle: []
-  EnemyUnitsInBattle: []
+  m_Script: {fileID: 11500000, guid: 4a02cae676767594e9e2c47a4a1e4dd6, type: 3}
+  m_Name: SavedMapData
+  m_EditorClassIdentifier: Assembly-CSharp::MapData
+  MapSeed: 0
+  NumberOfRows: 0
+  CurrentRoom: 0
+  CurrentRow: 0

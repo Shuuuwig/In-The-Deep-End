@@ -29,9 +29,9 @@ public class EnemyPlanState : PlanState
     {
         yield return new WaitForSeconds(1f);
         _currentActiveUnit.Moveset.Keys.ElementAt(0).Invoke();
-        _combatHandler.SelectedAction(_currentActiveUnit.Moveset.Keys.ElementAt(0));
+        CombatFunctions.SelectedAction(_currentActiveUnit.Moveset.Keys.ElementAt(0));
         int randomNumber = Random.Range(0, 2);
-        _combatHandler.SaveSelectedTargets(_turnController.PlayerSpawnPos[randomNumber].GetComponentInChildren<Unit>());
+        CombatFunctions.SaveSelectedTargets(_turnController.PlayerSpawnPos[randomNumber].GetComponentInChildren<Unit>());
         Debug.Log("Enemy Logic Ended");
 
         _turnController.ChangeState<ActionState>();
