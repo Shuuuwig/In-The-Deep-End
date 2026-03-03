@@ -432,6 +432,7 @@ MonoBehaviour:
   - {fileID: 495270794}
   _roomHandler: {fileID: 879660360}
   _roomSelectionPrefab: {fileID: 3761602012796187840, guid: 522361dc0432c1747919fd51c286ea21, type: 3}
+  _mapData: {fileID: 0}
   _combatData: {fileID: 11400000, guid: 425e86421ed487c4190cfd4cae06abcb, type: 2}
   _eventData: {fileID: 11400000, guid: 8db239c7c000d4040bd5ce06b35187d2, type: 2}
   _restData: {fileID: 11400000, guid: 40ae76179b4d18e4caf1b166715eafa0, type: 2}
