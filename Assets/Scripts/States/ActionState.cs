@@ -22,24 +22,23 @@ public class ActionState : TurnState
         base.RemoveListeners();
     }
 
-    protected IEnumerator HandleActions() // Ienumerator later
+    protected IEnumerator HandleActions()
     {
-        // handle damage, heal, buff and countermeasures for opposing side as well
-        ActionData actionDataUsed = _currentActiveUnit.Moveset[CombatFunctions.ActionUsed];
-        Debug.Log(actionDataUsed);
-        if (CombatFunctions.IsDamaging(actionDataUsed.ActionType))
+        // 1. Get the data for the action being used
+        ActionData actionDataUsed = _currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed];
+
+        if (CombatFunctions.IsEnemyTargeting(actionDataUsed.ActionCategory))
         {
-            Debug.Log("IsDamaging");
-            StartCoroutine(CombatFunctions.Damage());
-            CombatFunctions.StatusCheck();
+            Debug.Log($"Executing Damage Action: {actionDataUsed.ActionName}");
+
+            yield return StartCoroutine(CombatFunctions.Damage(_currentActiveUnit, _battleHandler.TargetedUnits));
         }
         else
         {
-            StartCoroutine(CombatFunctions.Buff());
+            // Handle Buffs/Heals
+            //yield return StartCoroutine(CombatFunctions.InflictStatusEffect(_battleHandler.TargetedUnits, actionDataUsed.));
         }
 
-        yield return new WaitUntil(() => !CombatFunctions.HandlingAction);
-        _turnController.ChangeState<TurnEndState>();
+        _battleHandler.ChangeState<TurnEndState>();
     }
-
 }

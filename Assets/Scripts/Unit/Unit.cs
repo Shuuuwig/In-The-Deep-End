@@ -1,93 +1,113 @@
-using System;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Events;
 
 public abstract class Unit : MonoBehaviour
 {
-    [Header("Unit Data")]
+    [Header("Unit Data & Moveset")]
     [SerializeField] protected UnitData _unitData;
-    protected List<ActionData> _actionDatas { get { return _unitData.ActionDatas; }}
     protected Dictionary<UnityAction, ActionData> _moveset = new Dictionary<UnityAction, ActionData>();
 
+    public UnityAction ActionUsed { get; protected set; }
+    public UnitData UnitData => _unitData;
+    public Dictionary<UnityAction, ActionData> Moveset => _moveset;
+    protected List<ActionData> _actionDatas => _unitData.ActionDatas;
+
     [Header("Component References")]
-    [SerializeField] protected AudioSource _audioSource;
-    [SerializeField] protected List<AudioClip> _audioClips;
-    [SerializeField] protected Animator _animator;
-    [SerializeField] protected List<AnimationClip> _animationClips;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private Animator _animator;
+    public AudioSource AudioSource => _audioSource;
+    public Animator Animator => _animator;
 
-    protected int _maxActionCount;
-    protected float _baseTurnValue;
+    [Header("Battle Identity")]
+    public int SpawnIndex;
+    public bool IsPlayer;
+    public List<StatusEffect> _statusEffects = new List<StatusEffect>();
 
-    public UnitData UnitData { get { return _unitData; } }
-    public Dictionary<UnityAction, ActionData> Moveset { get { return _moveset; } }
-    public AudioSource AudioSource { get { return _audioSource; } }
-    public Animator Animator { get { return _animator; } }
+    [Header("Growth Stats (Live Maxes)")]
+    public int CurrentLevel = 1;
+    public float MaxHealthPoints; // No longer just a pointer to _unitData
+    public float MaxResolvePoints;
+    public float BaseSpeed;
+    public float BaseDamage;
 
-    public float MaxHealthPoints { get { return _unitData.MaxHealthPoints; } }
-    public float MaxResolvePoints { get { return _unitData.MaxResolvePoints; } }
-    public float BaseSpeed { get { return _unitData.BaseSpeed; } }
-    public float BaseDamage { get { return _unitData.BaseDamage; ; } }
-    public int MaxActionCount { get { return _maxActionCount; } }
-    public float BaseTurnValue { get { return _baseTurnValue; } } // roundlength / speed
-
+    [Header("Live Battle State")]
     [HideInInspector] public float CurrentHealthPoints;
     [HideInInspector] public float CurrentSpeed;
     [HideInInspector] public float CurrentDamage;
     [HideInInspector] public float CurrentTurnValue;
     [HideInInspector] public int CurrentActionCount;
-    [HideInInspector] public AudioClip CurrentSoundClip;
+
+    [Header("Cached Assets")]
     [HideInInspector] public AnimationClip DefaultIdleClip;
-    [HideInInspector] public AnimationClip CurrentAnimationClip;
-    [HideInInspector] public bool IsDead;
+    [HideInInspector] public AnimationClip AttackAnimation;
+    [HideInInspector] public AnimationClip TakenDamage;
+    [HideInInspector] public AudioClip DamageSound;
+    [HideInInspector] public AudioClip TakenDamageSound;
+
+    protected int _maxActionCount;
+    protected float _baseTurnValue;
+    public float BaseTurnValue => _baseTurnValue;
+    public int MaxActionCount => _maxActionCount;
+
+    protected List<AudioClip> _audioClips => _unitData.AudioClips;
+    protected List<AnimationClip> _animationClips => _unitData.AnimationClips;
+
+    public virtual bool IsDead() => CurrentHealthPoints <= 0;
 
     protected virtual void Awake()
     {
-        DefaultIdleClip = _animationClips[0];
+        if (_animationClips != null && _animationClips.Count > 0)
+            DefaultIdleClip = _animationClips[0];
 
-        CalculateBaseTurnValue();
-
-        CurrentTurnValue = _baseTurnValue;
-        CurrentHealthPoints = MaxHealthPoints;
-        CurrentSpeed = BaseSpeed;
         InitializeUnit();
         MovesetHandler();
     }
 
-    protected virtual void Update()
-    {
-        // CalculateBaseTV();
-    }
-
-    protected virtual void CalculateBaseTurnValue()
-    {
-        
-    }
+    protected virtual void Update() { }
 
     public virtual void ResetActionCount()
     {
         CurrentActionCount = 0;
     }
 
-    public virtual void StatusCheck()
+    public virtual void ClearAction()
     {
-        CheckHealth();
-        //Check Dot effects
+        ActionUsed = null;
     }
 
-    protected abstract void InitializeUnit();
+    protected virtual void InitializeUnit()
+    {
+        MaxHealthPoints = _unitData.MaxHealthPoints;
+        MaxResolvePoints = _unitData.MaxResolvePoints;
+        BaseSpeed = _unitData.BaseSpeed;
+        BaseDamage = _unitData.BaseDamage;
+
+        CurrentHealthPoints = MaxHealthPoints;
+        CurrentSpeed = BaseSpeed;
+        CurrentDamage = BaseDamage;
+
+        _baseTurnValue = BattleHandler.TurnTVLength / BaseSpeed;
+        CurrentTurnValue = _baseTurnValue;
+    }
+
+    public virtual void LevelUp(float hpGain, float dmgGain, float speedGain)
+    {
+        CurrentLevel++;
+
+        MaxHealthPoints += hpGain;
+        BaseDamage += dmgGain;
+        BaseSpeed += speedGain;
+
+        CurrentHealthPoints = MaxHealthPoints;
+
+        Debug.Log($"{gameObject.name} leveled up to {CurrentLevel}!");
+    }
+
+    
+
     protected abstract void MovesetHandler();
     protected abstract void UnitUniqueUI();
-    protected virtual void CheckHealth()
-    {
-        if (CurrentHealthPoints <= 0)
-        {
-            if (this == null)
-                return;
-
-            IsDead = true;
-            gameObject.SetActive(false);
-        }
-    }
+    public abstract void StatusCheck();
+    public abstract bool CanCounter();
 }

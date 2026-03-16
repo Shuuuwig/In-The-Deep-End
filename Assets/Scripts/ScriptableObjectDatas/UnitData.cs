@@ -15,7 +15,7 @@ public class UnitData : ScriptableObject
     public Sprite CharacterSprite;
     public List<Sprite> CharacterIcons = new List<Sprite>();
     public List<Sprite> MarkedTargetIndicators = new List<Sprite>();
-    public List<Animation> CharacterAnimations = new List<Animation>();
+    public List<AudioClip> AudioClips;
+    public List<AnimationClip> AnimationClips;
     public List<ActionData> ActionDatas = new List<ActionData>();
-
 }

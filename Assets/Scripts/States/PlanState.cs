@@ -6,7 +6,7 @@ public class PlanState : TurnState
 {
     protected void Awake()
     {
-        InitializeReferences();
+        
     }
 
     public override void Enter()
@@ -14,11 +14,6 @@ public class PlanState : TurnState
         base.Enter();
         Debug.Log("Enter PlanState");
         LoadSelections();
-    }
-
-    protected override void InitializeReferences()
-    {
-        base.InitializeReferences();
     }
 
     protected virtual void LoadSelections()

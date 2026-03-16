@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +9,6 @@ public class MapHandler : MonoBehaviour
     [SerializeField] List<RectTransform> _rows = new List<RectTransform>();
 
     [Header("Room Prefabs & Data")]
-    [SerializeField] RoomHandler _roomHandler;
     [SerializeField] GameObject _roomSelectionPrefab;
     [SerializeField] MapData _mapData;
     [SerializeField] RoomData _combatData;
@@ -31,24 +29,22 @@ public class MapHandler : MonoBehaviour
 
     float _xOffset;
     float _yOffset;
-    string _currentRowPref = "CurrentRowOnMap";
-    string _currentMapSeedPref = "CurrentMapSeed";
-    string _currentMapIDPref = "CurrentMapID";
-    string _currentMapLastRowPref = "CurrentLastRowOnMap";
 
     void Start()
     {
-        if (PlayerPrefs.HasKey(_currentMapSeedPref))
+        // Use MapPrefs.Seed instead of local string
+        if (PlayerPrefs.HasKey(MapPrefs.Seed))
         {
-            _masterSeed = PlayerPrefs.GetInt(_currentMapSeedPref);
+            _masterSeed = PlayerPrefs.GetInt(MapPrefs.Seed);
         }
         else
         {
             _masterSeed = Random.Range(1, 1000000);
-            PlayerPrefs.SetInt(_currentMapSeedPref, _masterSeed);
+            PlayerPrefs.SetInt(MapPrefs.Seed, _masterSeed);
         }
 
-        PlayerPrefs.SetInt(_currentMapLastRowPref, _rows.Count - 1);
+        // Use MapPrefs.LastRow
+        PlayerPrefs.SetInt(MapPrefs.LastRow, _rows.Count - 1);
         StartCoroutine(GenerateMapRoutine());
     }
 
@@ -156,18 +152,17 @@ public class MapHandler : MonoBehaviour
         }
 
         List<RoomInfo> results = new List<RoomInfo>();
-        if (closest != null)
-            results.Add(closest);
-        if (second != null)
-            results.Add(second);
+        if (closest != null) results.Add(closest);
+        if (second != null) results.Add(second);
 
         return results;
     }
 
     public void ManageInitialSelections()
     {
-        int savedRow = PlayerPrefs.GetInt(_currentRowPref, -1);
-        int savedRoomID = PlayerPrefs.GetInt(_currentMapIDPref, -1);
+        // Use MapPrefs.Row and MapPrefs.RoomID
+        int savedRow = PlayerPrefs.GetInt(MapPrefs.Row, -1);
+        int savedRoomID = PlayerPrefs.GetInt(MapPrefs.RoomID, -1);
 
         for (int row = 0; row < _rows.Count; row++)
         {
@@ -201,13 +196,19 @@ public class MapHandler : MonoBehaviour
     {
         int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
 
+        // Logic check: if it's the last row, wipe progress
         if (roomRowIndex == _rows.Count - 1)
+        {
             ResetMapProgress();
+            return; // Don't save boss room as the "current" room for next run
+        }
 
-        PlayerPrefs.SetInt(_currentRowPref, roomRowIndex);
-        PlayerPrefs.SetInt(_currentMapIDPref, selectedRoom.transform.GetSiblingIndex());
+        // Save current progress using MapPrefs keys
+        PlayerPrefs.SetInt(MapPrefs.Row, roomRowIndex);
+        PlayerPrefs.SetInt(MapPrefs.RoomID, selectedRoom.transform.GetSiblingIndex());
         PlayerPrefs.Save();
 
+        // Disable all rooms
         foreach (RectTransform row in _rows)
         {
             RoomInfo[] rooms = row.GetComponentsInChildren<RoomInfo>();
@@ -217,6 +218,7 @@ public class MapHandler : MonoBehaviour
             }
         }
 
+        // Enable only the connected next rooms
         foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
         {
             nextRoom.SetInteractable(true);
@@ -226,12 +228,13 @@ public class MapHandler : MonoBehaviour
     public void ResetMapProgress()
     {
         _masterSeed = 0;
+        if(_mapData != null) _mapData.CurrentRow = 0;
 
-        _mapData.CurrentRow = 0;
-
-        PlayerPrefs.DeleteKey(_currentMapSeedPref);
-        PlayerPrefs.DeleteKey(_currentRowPref);
-        PlayerPrefs.DeleteKey(_currentMapIDPref);
+        // Wipe all keys from MapPrefs
+        PlayerPrefs.DeleteKey(MapPrefs.Seed);
+        PlayerPrefs.DeleteKey(MapPrefs.Row);
+        PlayerPrefs.DeleteKey(MapPrefs.RoomID);
+        PlayerPrefs.DeleteKey(MapPrefs.LastRow);
         PlayerPrefs.Save();
     }
 
@@ -267,39 +270,28 @@ public class MapHandler : MonoBehaviour
 
     int NumberOfRoomsInRow(int currentRow)
     {
-        if (currentRow == 0)
-            return Random.Range(2, 4);
-        if (currentRow == _rows.Count - 1)
-            return 1;
+        if (currentRow == 0) return Random.Range(2, 4);
+        if (currentRow == _rows.Count - 1) return 1;
 
         float noise = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
-
-        if (noise > 0.5)
-            return Random.Range(2, 4);
-
-        return Random.Range(1, 3);
+        return noise > 0.5f ? Random.Range(2, 4) : Random.Range(1, 3);
     }
 
     RoomData RandomizeRoomData(int row)
     {
-        if (row == 0 || row == _rows.Count - 1)
-            return _combatData;
+        if (row == 0 || row == _rows.Count - 1) return _combatData;
 
         float randomValue = Random.value;
-
-        if (randomValue < _combatRoomSpawnChance)
-            return _combatData;
-
-        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance))
-            return _eventData;
-
+        if (randomValue < _combatRoomSpawnChance) return _combatData;
+        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance)) return _eventData;
         return _restData;
     }
 
     void SpawnRoomSelection(RoomData roomData, int row)
     {
         GameObject newRoom = Instantiate(_roomSelectionPrefab, _rows[row]);
-        newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this, _roomHandler);
+        // Note: Added _mapData to the call based on your code snippet
+        newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this);
     }
 
     void SnapToBottom()

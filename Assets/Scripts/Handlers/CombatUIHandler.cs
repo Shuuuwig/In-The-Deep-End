@@ -1,315 +1,345 @@
-// using UnityEngine;
-// using TMPro;
-// using System.Collections.Generic;
-// using UnityEngine.UI;
-// using System.Linq;
-// using System;
-// using UnityEngine.Events;
+using UnityEngine;
+using TMPro;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Linq;
+using UnityEngine.Events;
 
-// public class CombatUIHandler : MonoBehaviour
-// {
-//     [SerializeField] protected BattleData _battleData;
-//     [SerializeField] protected TurnHandler _turnHandler;
-//     [SerializeField] protected CombatFunctions _combatHandler;
-//     protected ActionData _targetTypeData;
+public class CombatUIHandler : MonoBehaviour
+{
+    [Header("Core References")]
+    [SerializeField] private BattleHandler _battleHandler;
 
-//     [SerializeField] protected GameObject _actionPanel;
-//     [SerializeField] protected GameObject _confirmButton;
-//     [SerializeField] protected GameObject _buttonPrefab;
-//     [SerializeField] protected List<Slider> _playerHealthbars;
-//     [SerializeField] protected List<Slider> _enemyHealthbars;
-//     [SerializeField] protected List<GameObject> _turnValueDisplay;
-//     [SerializeField] protected List<GameObject> _movesetSelections;
-//     protected List<Image> _turnValuePortrait = new List<Image>();
-//     protected List<TMP_Text> _turnValueText = new List<TMP_Text>();
-//     protected List<Button> _movesetButtons = new List<Button>();
-//     protected List<TMP_Text> _movesetButtonText = new List<TMP_Text>();
+    [Header("UI Panels & Prefabs")]
+    [SerializeField] private GameObject _actionPanel;
 
-//     protected GameObject _currentTargetedPosition;
-//     protected Unit _currentActiveUnit { get { return _turnHandler.CurrentActiveUnit; } }
-//     protected SpriteRenderer _currentTargetIndicator;
-//     protected List<SpriteRenderer> _markedTargetIndicators = new List<SpriteRenderer>(); // this is different from current target indicator\
-//     [SerializeField] protected List<SpriteRenderer> _playerMarkedTargetIndicator = new List<SpriteRenderer>();
-//     [SerializeField] protected List<SpriteRenderer> _enemyMarkedTargetIndicator = new List<SpriteRenderer>();
-//     protected List<GameObject> _playerSpawnPos { get { return _turnHandler.PlayerSpawnPos; } }
-//     protected List<GameObject> _enemySpawnPos { get { return _turnHandler.EnemySpawnPos; } }
+    [Header("Health & Turn Displays")]
+    [SerializeField] private List<Slider> _playerHealthbars;
+    [SerializeField] private List<Slider> _enemyHealthbars;
+    [SerializeField] private List<GameObject> _turnValueDisplay;
 
-//     public GameObject CurrentTargetedPosition { get { return _currentTargetedPosition; } }
+    [Header("Move Selection")]
+    [SerializeField] private List<GameObject> _movesetSelections;
 
-//     protected void Awake()
-//     {
-//         for (int i = 0; i < _movesetSelections.Count; i++)
-//         {
-//             _movesetButtons.Add(_movesetSelections[i].GetComponent<Button>());
-//             _movesetButtonText.Add(_movesetButtons[i].GetComponentInChildren<TMP_Text>());
-//         }
+    [Header("Target Indicators")]
+    [SerializeField] private List<SpriteRenderer> _playerMarkedTargetIndicator;
+    [SerializeField] private List<SpriteRenderer> _enemyMarkedTargetIndicator;
 
-//         for (int i = 0; i < _turnValueDisplay.Count; i++)
-//         {
-//             //_turnValuePortrait[i] = _turnValueDisplay[i].GetComponentInChildren<Image>();
-//             TMP_Text turnText = _turnValueDisplay[i].GetComponentInChildren<TMP_Text>();
-//             _turnValueText.Add(turnText);
-//         }
-//     }
+    private ActionData _targetTypeData;
+    private GameObject _currentTargetedPosition;
+    private SpriteRenderer _currentTargetIndicator;
 
-//     public void InitializeHealthDisplay()
-//     {
-//         ShowHealthbars();
+    private List<Image> _turnValuePortrait = new List<Image>();
+    private List<TMP_Text> _turnValueText = new List<TMP_Text>();
+    private List<Button> _movesetButtons = new List<Button>();
+    private List<TMP_Text> _movesetButtonText = new List<TMP_Text>();
+    private List<SpriteRenderer> _markedTargetIndicators = new List<SpriteRenderer>();
 
-//         for (int i = 0; i < _playerSpawnPos.Count; i++)
-//         {
-//             for (int j = 0; j < _turnHandler.ActiveUnits.Count; j++)
-//             {
-//                 if (_turnHandler.ActiveUnits[j].transform.parent.gameObject == _playerSpawnPos[i].gameObject)
-//                 {
-//                     _playerHealthbars[i].maxValue = _turnHandler.ActiveUnits[j].MaxHealthPoints;
-//                     _playerHealthbars[i].minValue = 0;
-//                     _playerHealthbars[i].value = _turnHandler.ActiveUnits[j].CurrentHealthPoints;
-//                     Debug.Log("Initialized Player Health Display");
-//                 }
+    public GameObject CurrentTargetedPosition => _currentTargetedPosition;
+    protected Unit _currentActiveUnit => _battleHandler.CurrentActiveUnit;
+    protected List<GameObject> _playerSpawnPos => _battleHandler.PlayerSpawnPos;
+    protected List<GameObject> _enemySpawnPos => _battleHandler.EnemySpawnPos;
 
-//                 if (_turnHandler.ActiveUnits[j].transform.parent.gameObject == _enemySpawnPos[i].gameObject)
-//                 {
-//                     _enemyHealthbars[i].maxValue = _turnHandler.ActiveUnits[j].MaxHealthPoints;
-//                     _enemyHealthbars[i].minValue = 0;
-//                     _enemyHealthbars[i].value = _turnHandler.ActiveUnits[j].CurrentHealthPoints;
-//                     Debug.Log("Initialized Enemy Health Display");
-//                 }
-//             }
+    protected void Start()
+    {
+        foreach (GameObject selection in _movesetSelections)
+        {
+            Button button = selection.GetComponent<Button>();
+            _movesetButtons.Add(button);
+            _movesetButtonText.Add(button.GetComponentInChildren<TMP_Text>());
+        }
 
-//         }
-//     }
+        foreach (GameObject display in _turnValueDisplay)
+        {
+            _turnValuePortrait.Add(display.GetComponentInChildren<Image>());
+            _turnValueText.Add(display.GetComponentInChildren<TMP_Text>());
+        }
+    }
 
-//     public void UpdateHealthDisplay(List<Unit> targetedUnits)
-//     {
-//         for (int i = 0; i < _playerSpawnPos.Count; i++)
-//         {
-//             for (int j = 0; j < targetedUnits.Count; j++)
-//             {
-//                 if (targetedUnits[j].transform.parent.gameObject == _playerSpawnPos[i].gameObject)
-//                 {
-//                     _playerHealthbars[i].value = targetedUnits[j].CurrentHealthPoints;
+    public void InitializeHealthDisplay()
+    {
+        ShowHealthbars();
 
-//                     Debug.Log("Updated Health Display");
-//                 }
-//                 else if (targetedUnits[j].transform.parent.gameObject == _enemySpawnPos[i].gameObject)
-//                 {
-//                     _enemyHealthbars[i].value = targetedUnits[j].CurrentHealthPoints;
+        foreach (Unit unit in _battleHandler.ActiveUnits)
+        {
+            GameObject parentPos = unit.transform.parent.gameObject;
 
-//                     Debug.Log("Updated Health Display");
-//                 }
-//             }
-//         }
-//         HideHealthBars();
-//     }
+            for (int i = 0; i < _playerSpawnPos.Count; i++)
+            {
+                if (parentPos == _playerSpawnPos[i])
+                {
+                    SetupHealthSlider(_playerHealthbars[i], unit);
+                    break;
+                }
+            }
 
-//     public void ShowHealthbars()
-//     {
-//         for (int i = 0; i < _playerSpawnPos.Count; i++)
-//         {
-//             if (_playerSpawnPos[i].GetComponentInChildren<Unit>() == null)
-//                 continue;
+            for (int i = 0; i < _enemySpawnPos.Count; i++)
+            {
+                if (parentPos == _enemySpawnPos[i])
+                {
+                    SetupHealthSlider(_enemyHealthbars[i], unit);
+                    break;
+                }
+            }
+        }
+    }
 
-//             bool unitDead = _playerSpawnPos[i].GetComponentInChildren<Unit>().IsDead;
+    private void SetupHealthSlider(Slider slider, Unit unit)
+    {
+        slider.maxValue = unit.MaxHealthPoints;
+        slider.minValue = 0;
+        slider.value = unit.CurrentHealthPoints;
+    }
 
-//             if (!unitDead)
-//             {
-//                 _playerHealthbars[i].gameObject.SetActive(true);
-//             }
-//         }
+    public void UpdateHealthDisplay(List<Unit> targetedUnits)
+    {
+        foreach (Unit unit in targetedUnits)
+        {
+            if (unit.IsPlayer)
+            {
+                _playerHealthbars[unit.SpawnIndex].value = unit.CurrentHealthPoints;
+            }
+            else
+            {
+                _enemyHealthbars[unit.SpawnIndex].value = unit.CurrentHealthPoints;
+            }
 
-//         for (int i = 0; i < _enemySpawnPos.Count; i++)
-//         {
-//             if (_enemySpawnPos[i].GetComponentInChildren<Unit>() == null)
-//                 continue;
+            Debug.Log($"Updated Health Display for {unit.name}");
+        }
 
-//             bool unitDead = _enemySpawnPos[i].GetComponentInChildren<Unit>().IsDead;
+        HideHealthBars();
+    }
 
-//             if (!unitDead)
-//             {
-//                 _enemyHealthbars[i].gameObject.SetActive(true);
-//             }
-//         }
-//     }
-//     public void HideHealthBars()
-//     {
-//         for (int i = 0; i < _playerHealthbars.Count; i++)
-//         {
-//             if (_playerHealthbars[i].value <= 0)
-//                 _playerHealthbars[i].gameObject.SetActive(false);
-//         }
+    public void ShowHealthbars()
+    {
+        foreach (Unit unit in _battleHandler.ActiveUnits)
+        {
+            if (unit.IsDead())
+                continue;
 
-//         for (int i = 0; i < _enemyHealthbars.Count; i++)
-//         {
-//             if (_enemyHealthbars[i].value <= 0)
-//                 _enemyHealthbars[i].gameObject.SetActive(false);
-//         }
-//     }
+            if (unit.IsPlayer)
+            {
+                _playerHealthbars[unit.SpawnIndex].gameObject.SetActive(true);
+            }
+            else
+            {
+                _enemyHealthbars[unit.SpawnIndex].gameObject.SetActive(true);
+            }
+        }
+    }
 
-//     public void SetupSelections(int movesetCount, Dictionary<UnityAction, ActionData> moveset, UnityAction acting)
-//     {
-//         _actionPanel.SetActive(true);
+    public void HideHealthBars()
+    {
+        ToggleHealthBarList(_playerHealthbars);
+        ToggleHealthBarList(_enemyHealthbars);
+    }
 
-//         for (int i = 0; i < movesetCount; i++)
-//         {
-//             if (moveset.Keys.ElementAt(i) == null) // Last left off
-//                 continue;
+    private void ToggleHealthBarList(List<Slider> bars)
+    {
+        foreach (var bar in bars)
+        {
+            if (bar.gameObject.activeSelf && bar.value <= 0)
+            {
+                bar.gameObject.SetActive(false);
+            }
+        }
+    }
+    public void SetupSelections(int movesetCount, Dictionary<UnityAction, ActionData> moveset, UnityAction acting)
+    {
+        _actionPanel.SetActive(true);
 
-//             int index = i;
-//             _movesetSelections[i].SetActive(true);
-//             _movesetButtons[i].onClick.AddListener(() => _combatHandler.SelectedAction(moveset.Keys.ElementAt(index)));
-//             _movesetButtons[i].onClick.AddListener(moveset.Keys.ElementAt(i));
-//             _movesetButtons[i].onClick.AddListener(acting);
-//             _movesetButtonText[i].text = $"{moveset.Values.ElementAt(i).ActionName}";
-//         }
-//     }
+        for (int i = 0; i < movesetCount; i++)
+        {
+            var movePair = moveset.ElementAtOrDefault(i);
+            if (movePair.Key == null)
+                continue;
 
-//     public void HideMovesetSelections(int movesetCount)
-//     {
-//         Debug.Log("Hiding menu");
+            // Local copy of index for the Lambda
+            int index = i;
+            UnityAction moveAction = movePair.Key;
+            ActionData moveData = movePair.Value;
 
-//         for (int i = 0; i < movesetCount; i++)
-//         {
-//             _movesetButtonText[i].text = $"";
-//             _movesetSelections[i].SetActive(false);
-//             _movesetButtons[i].onClick.RemoveAllListeners();
-//             Debug.Log("Hiding button");
-//         }
+            _movesetSelections[index].SetActive(true);
+            _movesetButtons[index].onClick.AddListener(moveAction);
+            _movesetButtons[index].onClick.AddListener(acting);
 
-//         _actionPanel.SetActive(false);
-//     }
+            _movesetButtonText[index].text = moveData.ActionName;
+        }
+    }
 
-//     public void CheckCurrentTarget(int vectorDirection)
-//     {
-//         for (int i = 0; i < _enemySpawnPos.Count; i++)
-//         {
-//             if (_enemySpawnPos[i] == _currentTargetedPosition)
-//             {
-//                 if (i + vectorDirection < _enemySpawnPos.Count && i + vectorDirection >= 0)
-//                 {
-//                     if (_enemyHealthbars[i + vectorDirection].gameObject.activeSelf == false)
-//                         continue;
+    public void HideSelections()
+    {
+        Debug.Log("Hiding action menu");
 
-//                     Debug.Log($"{i + vectorDirection}");
-//                     _currentTargetedPosition = _enemySpawnPos[i + vectorDirection];
-//                     _currentTargetIndicator.enabled = false;
-//                     ShowCurrentIndicator();
-//                     break;
-//                 }
-//             }
-//             else if (_playerSpawnPos[i] == _currentTargetedPosition)
-//             {
-//                 if (i + -vectorDirection < _playerSpawnPos.Count && i + -vectorDirection >= 0)
-//                 {
-//                     if (_playerHealthbars[i + -vectorDirection].gameObject.activeSelf == false)
-//                         continue;
+        for (int i = 0; i < _movesetButtons.Count; i++)
+        {
+            _movesetButtonText[i].text = string.Empty;
+            _movesetButtons[i].onClick.RemoveAllListeners();
+            _movesetSelections[i].SetActive(false);
+        }
 
-//                     Debug.Log($"{i + vectorDirection}");
-//                     _currentTargetedPosition = _playerSpawnPos[i + -vectorDirection];
-//                     _currentTargetIndicator.enabled = false;
-//                     ShowCurrentIndicator();
-//                     break;
-//                 }
-//             }
-//         }
-//     }
+        _actionPanel.SetActive(false);
+    }
 
-//     public void ShowCurrentIndicator() // add parameter later for target sprite for units
-//     {
-//         if (_currentTargetedPosition == null)
-//             GetValidTarget();
+    public void CheckCurrentTarget(int vectorDirection)
+    {
+        List<GameObject> currentList;
+        List<Slider> currentHealthBars;
+        int step;
 
-//         _currentTargetIndicator = _currentTargetedPosition.GetComponent<SpriteRenderer>();
-//         _currentTargetIndicator.enabled = true;
+        if (_enemySpawnPos.Contains(_currentTargetedPosition))
+        {
+            currentList = _enemySpawnPos;
+            currentHealthBars = _enemyHealthbars;
+            step = vectorDirection;
+        }
+        else
+        {
+            currentList = _playerSpawnPos;
+            currentHealthBars = _playerHealthbars;
+            step = -vectorDirection;
+        }
 
-//     }
+        int currentIndex = currentList.IndexOf(_currentTargetedPosition);
+        int nextIndex = currentIndex + step;
 
-//     protected void GetValidTarget()
-//     {
-//         if (_combatHandler.AllyTargeting(_currentActiveUnit.Moveset[_combatHandler.ActionUsed].ActionType) == false)
-//         {
-//             for (int i = 0; i < _enemySpawnPos.Count; i++)
-//             {
-//                 Unit UnitInPos = _enemySpawnPos[i].GetComponentInChildren<Unit>();
-//                 if (UnitInPos != null)
-//                 {
-//                     _currentTargetedPosition = _enemySpawnPos[i];
-//                     break;
-//                 }
-//             }
+        while (nextIndex >= 0 && nextIndex < currentList.Count)
+        {
+            if (currentHealthBars[nextIndex].gameObject.activeSelf == true)
+            {
+                _currentTargetedPosition = currentList[nextIndex];
 
-//             _markedTargetIndicators = _enemyMarkedTargetIndicator;
-//             Debug.Log("Not ally targeting move");
-//         }
-//         else if (_combatHandler.AllyTargeting(_currentActiveUnit.Moveset[_combatHandler.ActionUsed].ActionType))
-//         {
-//             for (int i = 0; i < _playerSpawnPos.Count; i++)
-//             {
-//                 Unit UnitInPos = _playerSpawnPos[i].GetComponentInChildren<Unit>();
-//                 if (UnitInPos != null)
-//                 {
-//                     _currentTargetedPosition = _playerSpawnPos[i];
-//                     break;
-//                 }
-//             }
+                if (_currentTargetIndicator != null)
+                {
+                    _currentTargetIndicator.enabled = false;
+                }
 
-//             _markedTargetIndicators = _playerMarkedTargetIndicator;
-//             Debug.Log("Ally targeting move");
-//         }
-//         Debug.Log(_currentTargetedPosition);
-//     }
+                ShowCurrentIndicator();
+                return;
+            }
 
-//     public void HideCurrentIndicator()
-//     {
-//         _currentTargetIndicator.enabled = false;
-//         _currentTargetIndicator = null;
-//         _currentTargetedPosition = null;
-//     }
+            nextIndex = nextIndex + step;
+        }
 
-//     public void SaveSelectedTargets()
-//     {
-//         for (int i = 0; i < _markedTargetIndicators.Count; i++)
-//         {
-//             if (_currentTargetedPosition == _markedTargetIndicators[i].transform.parent.gameObject)
-//             {
-//                 Debug.Log("Saving Targets");
-//                 if (_markedTargetIndicators[i].enabled)
-//                 {
-//                     int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(_markedTargetIndicators[i].sprite);
-//                     _markedTargetIndicators[i].sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
-//                 }
-//                 else
-//                 {
-//                     _markedTargetIndicators[i].sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
-//                     _markedTargetIndicators[i].enabled = true;
-//                 }
-//             }
-//         }
+        Debug.Log("No valid targets found in that direction.");
+    }
 
-//     }
+    public void ShowCurrentIndicator()
+    {
+        if (_currentTargetedPosition == null)
+        {
+            GetValidTarget();
+            if (_currentTargetedPosition == null)
+                return;
+        }
 
-//     public void ResetSelectedTargets()
-//     {
-//         for (int i = 0; i < _markedTargetIndicators.Count; i++)
-//         {
-//             _markedTargetIndicators[i].enabled = false;
-//             _markedTargetIndicators[i].sprite = null;
-//         }
-//     }
+        _currentTargetIndicator = _currentTargetedPosition.GetComponent<SpriteRenderer>();
 
-//     public void UpdateTurnDisplay()
-//     {
-//         for (int i = 0; i < _turnValueText.Count; i++)
-//         {
-//             if (i < _turnHandler.ActiveUnits.Count)
-//             {
-//                 _turnValueText[i].text = $"{_turnHandler.ActiveUnits[i].name} TV: {_turnHandler.ActiveUnits[i].CurrentTurnValue}";
-//             }
-//             else
-//             {
-//                 _turnValueText[i].text = "";
-//             }
-//         }
+        if (_currentTargetIndicator != null)
+        {
+            _currentTargetIndicator.enabled = true;
+        }
+    }
 
-//     }
-// }
+    protected void GetValidTarget()
+    {
+        bool isAllyTargeting = CombatFunctions.IsAllyTargeting(_currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].ActionCategory);
+
+        if (isAllyTargeting == false)
+        {
+            for (int i = 0; i < _enemySpawnPos.Count; i++)
+            {
+                if (_enemyHealthbars[i].gameObject.activeSelf == true)
+                {
+                    _currentTargetedPosition = _enemySpawnPos[i];
+                    break;
+                }
+            }
+
+            _markedTargetIndicators = _enemyMarkedTargetIndicator;
+            Debug.Log("Not ally targeting move - finding first living enemy");
+        }
+        else
+        {
+            for (int i = 0; i < _playerSpawnPos.Count; i++)
+            {
+                if (_playerHealthbars[i].gameObject.activeSelf == true)
+                {
+                    _currentTargetedPosition = _playerSpawnPos[i];
+                    break;
+                }
+            }
+
+            _markedTargetIndicators = _playerMarkedTargetIndicator;
+            Debug.Log("Ally targeting move - finding first living player");
+        }
+
+        Debug.Log(_currentTargetedPosition);
+    }
+
+    public void HideCurrentIndicator()
+    {
+        if (_currentTargetIndicator != null)
+        {
+            _currentTargetIndicator.enabled = false;
+        }
+
+        _currentTargetIndicator = null;
+        _currentTargetedPosition = null; // check here later
+    }
+
+    public void SaveSelectedTargets()
+{
+    Unit targetedUnit = _currentTargetedPosition.GetComponentInChildren<Unit>();
+
+    if (targetedUnit != null)
+    {
+        _battleHandler.TargetedUnits.Add(targetedUnit);
+
+        int index = targetedUnit.SpawnIndex;
+        SpriteRenderer markedTargetIndicator = _markedTargetIndicators[index];
+
+        Debug.Log($"Target Saved: {targetedUnit.name}. Total Hits queued: {_battleHandler.TargetedUnits.Count}");
+
+        if (markedTargetIndicator.enabled)
+        {
+            int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(markedTargetIndicator.sprite);
+
+            if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
+            {
+                markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
+            }
+        }
+        else
+        {
+            markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
+            markedTargetIndicator.enabled = true;
+        }
+    }
+}
+
+    public void ResetTargetsIndicators()
+    {
+        for (int i = 0; i < _markedTargetIndicators.Count; i++)
+        {
+            _markedTargetIndicators[i].enabled = false;
+            _markedTargetIndicators[i].sprite = null;
+        }
+    }
+
+    public void UpdateTurnDisplay()
+    {
+        for (int i = 0; i < _turnValueText.Count; i++)
+        {
+            if (i < _battleHandler.ActiveUnits.Count)
+            {
+                Unit unit = _battleHandler.ActiveUnits[i];
+                _turnValueText[i].text = $"{unit.name} TV: {unit.CurrentTurnValue}";
+            }
+            else
+            {
+                _turnValueText[i].text = string.Empty;
+            }
+        }
+    }
+}

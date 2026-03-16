@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class StateMachine : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class StateMachine : MonoBehaviour
     public virtual void ChangeState<T>() where T : State
     {
         _newState = GetComponent<T>();
+
         if (_newState == null)
             _newState = gameObject.AddComponent<T>();
 

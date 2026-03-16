@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,18 +7,21 @@ public class PlayerGunslingerUnit : Unit
 {
     protected int _maxAmmo;
     protected int _currentAmmo;
-    protected Dictionary<UnityAction, ActionData> _noAmmoMoveset = new Dictionary<UnityAction, ActionData>();
+    
+    [Header("Gunslinger UI")]
     protected Canvas _canvas;
-    protected GameObject passiveUI;
-    protected RectTransform AmmoRectTransform;
-    protected TMP_Text AmmoNumber;
+    protected GameObject _passiveUI;
+    protected TMP_Text _ammoNumber;
+
     protected override void InitializeUnit()
     {
-        _maxAmmo = _actionDatas[0].MaxActionCount;
-        _canvas = FindAnyObjectByType<Canvas>();
+        base.InitializeUnit();
 
-        CurrentActionCount = 0;
+        _maxAmmo = _actionDatas[0].MaxActionCount;
         _currentAmmo = _maxAmmo;
+
+        if (_canvas == null) _canvas = FindAnyObjectByType<Canvas>();
+
         UnitUniqueUI();
     }
 
@@ -28,84 +29,107 @@ public class PlayerGunslingerUnit : Unit
     {
         _moveset.Clear();
 
-        if (_maxAmmo - _currentAmmo >= _maxAmmo)
+        if (_currentAmmo > 0)
         {
-            _moveset.Add(Reload, _actionDatas[1]);
+            _moveset.Add(ChamberShots, _actionDatas[0]);
         }
-        else if (_moveset.Count == 0)
-        {
-            _moveset.Add(ChamberShots, _actionDatas[0]); // Swap this later
-            _moveset.Add(Reload, _actionDatas[1]);
-        }
+        
+        _moveset.Add(Reload, _actionDatas[1]);
     }
 
     protected override void UnitUniqueUI()
     {
-        passiveUI = new GameObject("Gunslinger Ammo");
-        passiveUI.transform.SetParent(_canvas.transform);
-        passiveUI.AddComponent<TextMeshProUGUI>();
+        if (_passiveUI == null)
+        {
+            _passiveUI = new GameObject("Gunslinger Ammo");
+            _passiveUI.transform.SetParent(_canvas.transform, false);
+            _ammoNumber = _passiveUI.AddComponent<TextMeshProUGUI>();
+        }
 
-        AmmoRectTransform = passiveUI.GetComponent<RectTransform>();
-        AmmoRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 60);
-        AmmoRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 40);
-        AmmoRectTransform.position = new Vector3(AmmoRectTransform.position.x - 50, AmmoRectTransform.position.x - 50, AmmoRectTransform.position.x);
+        RectTransform rect = _passiveUI.GetComponent<RectTransform>();
+        
+        rect.anchorMin = new Vector2(0, 0);
+        rect.anchorMax = new Vector2(0, 0);
+        rect.pivot = new Vector2(0, 0);
+        
+        rect.anchoredPosition = new Vector2(50, 50); 
+        rect.sizeDelta = new Vector2(200, 50);
 
-        AmmoNumber = passiveUI.GetComponent<TMP_Text>();
-        AmmoNumber.text = $"Ammo : {_currentAmmo} / {_maxAmmo}";
-        AmmoNumber.fontSize = 8f;
-
+        _ammoNumber.fontSize = 24f; 
+        _ammoNumber.alignment = TextAlignmentOptions.BottomLeft;
+        
+        UpdateAmmoText();
     }
 
     public override void ResetActionCount()
     {
         AmmoCheck();
-        base.ResetActionCount();
+    }
+
+    public override void ClearAction()
+    {
+        ActionUsed = null;
     }
 
     public override void StatusCheck()
     {
-        base.StatusCheck();
         MovesetHandler();
+    }
+
+    public override bool CanCounter()
+    {
+        return _currentAmmo >= 2;
     }
 
     protected void AmmoCheck()
     {
-        if (AmmoNumber == null)
-            AmmoNumber = passiveUI.GetComponent<TMP_Text>();
-
-        // if (_combatHandler.ActionUsed == Reload)
-        //      _currentAmmo = _maxAmmo;
-        else
+        if (ActionUsed == Reload)
+        {
+            _currentAmmo = _maxAmmo;
+        }
+        else if (ActionUsed == ChamberShots)
+        {
             _currentAmmo -= CurrentActionCount;
+        }
 
-        Debug.Log($"{_currentAmmo}");
-        AmmoNumber.text = $"Ammo : {_currentAmmo} / {_maxAmmo}";
-        AmmoNumber.fontSize = 8f;
+        _currentAmmo = Mathf.Clamp(_currentAmmo, 0, _maxAmmo);
+        UpdateAmmoText();
+    }
+
+    private void UpdateAmmoText()
+    {
+        if (_ammoNumber != null)
+        {
+            _ammoNumber.text = $"Ammo : {_currentAmmo} / {_maxAmmo}";
+        }
     }
 
     protected void ChamberShots()
     {
-        CurrentDamage = 0;
+        ActionUsed = ChamberShots;
 
         if (_currentAmmo < _actionDatas[0].MaxActionCount)
         {
             _maxActionCount = _currentAmmo;
         }
         else
+        {
             _maxActionCount = _actionDatas[0].MaxActionCount;
+        }
 
-        CurrentDamage = BaseDamage * _actionDatas[0].DamageMultiplier;
-
-        CurrentSoundClip = _audioClips[0];
-        CurrentAnimationClip = _animationClips[1];
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+        DamageSound = _audioClips[0];
+        AttackAnimation = _animationClips[1];
     }
 
     protected void Reload()
     {
+        ActionUsed = Reload;
+
         CurrentDamage = 0;
         _maxActionCount = _actionDatas[1].MaxActionCount;
 
-        CurrentSoundClip = _audioClips[1];
-        CurrentAnimationClip = _animationClips[1];
+        DamageSound = _audioClips[1];
+        AttackAnimation = _animationClips[1];
     }
 }

@@ -3,152 +3,99 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class CombatFunctions : MonoBehaviour
+public static class CombatFunctions
 {
-    string _currentRowPref = "CurrentRowOnMap";
-    string _currentMapSeedPref = "CurrentMapSeed";
-    string _currentMapIDPref = "CurrentMapID";
-    string _currentMapLastRowPref = "CurrentLastRowOnMap";
-
-    public bool AllyTargeting(ActionType actionType)
+    public static bool IsAllyTargeting(ActionCategory actionType)
     {
         switch (actionType)
         {
-            case ActionType.Buff:
-                return true;
 
-            case ActionType.Light:
-            case ActionType.Heavy:
-            case ActionType.Piercing:
-            case ActionType.Debuff:
-                return false;
-
-            default:
-                return false;
         }
+        return false;
     }
 
-    public bool IsDamaging(ActionType actionType)
+    public static bool IsEnemyTargeting(ActionCategory actionType)
     {
-        switch (actionType)
-        {
-            case ActionType.Light:
-            case ActionType.Heavy:
-            case ActionType.Piercing:
-                return true;
-
-            case ActionType.Buff:
-            case ActionType.Debuff:
-                return false;
-
-            default:
-                return false;
-        }
+        return false;
     }
 
-    public void TargetingType(TargetType targetType)
+    private static CombatUIHandler _combatUIHandler;
+
+    public static void Initialize(CombatUIHandler combatUIHandler)
     {
-        switch (targetType)
-        {
-            case TargetType.Self:
-                return;
-
-            case TargetType.Single:
-                return;
-
-            case TargetType.MultiSingle:
-                return;
-
-            case TargetType.Burst:
-                return;
-
-            case TargetType.FullAOE:
-                return;
-        }
+        combatUIHandler = _combatUIHandler;
     }
 
-    public BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> bossBattle)
+    public static BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> tier3Battle)
     {
-        if (PlayerPrefs.GetInt(_currentRowPref) <= 2)
+        if (PlayerPrefs.GetInt(MapPrefs.Row) <= 2)
             return tier1Battle[Random.Range(0, tier1Battle.Count)];
-            
-        if (PlayerPrefs.GetInt(_currentRowPref) == PlayerPrefs.GetInt(_currentMapLastRowPref))
-            return bossBattle[Random.Range(0, bossBattle.Count)];
+
+        if (PlayerPrefs.GetInt(MapPrefs.Row) == PlayerPrefs.GetInt(MapPrefs.LastRow))
+            return tier3Battle[Random.Range(0, tier3Battle.Count)];
         return tier2Battle[Random.Range(0, tier2Battle.Count)];
     }
 
-    public void ResetActionCount(Unit currentActiveUnit)
+    public static void ResetActionCount(Unit currentActiveUnit)
     {
         currentActiveUnit.ResetActionCount();
     }
 
-    public void StatusCheck(List<Unit> activeUnits)
+    public static List<Unit> SaveSelectedTargets(List<Unit> targetedUnits, Unit targetedUnit)
     {
-        for (int i = 0; i < activeUnits.Count; i++)
-        {
-            activeUnits[i].StatusCheck();
-            Debug.Log($"UNITS IN LIST: {activeUnits[i]}");
-        }
-
-        // _combatUIHandler.UpdateHealthDisplay(_turnHandler.ActiveUnits);
-        // _turnHandler.SortUnits();
-
+        targetedUnits.Add(targetedUnit);
+        Debug.Log(targetedUnits[0].name);
+        return targetedUnits;
     }
 
-    // public void SelectedAction(UnityAction action)
-    // {
-    //     ActionUsed = action;
-    // }
+    public static void ClearSelectedTargets(List<Unit> targetedUnits)
+    {
+        targetedUnits.Clear();
+    }
 
-    // public void ClearAction()
-    // {
-    //     ActionUsed = null;
-    // }
+    public static IEnumerator Damage(Unit self, List<Unit> targets)
+    {
+        for (int index = 0; index < targets.Count; index++)
+        {
+            if (targets[index].IsDead()) //in case of multiple hits on same target and already died
+                continue;
 
-    // public void SaveSelectedTargets(Unit targetedUnit)
-    // {
-    //     TargetedUnits.Add(targetedUnit);
-    //     Debug.Log(TargetedUnits[0].name);
-    // }
+            targets[index].CurrentHealthPoints -= self.CurrentDamage;
+            Debug.Log($"Now targeting: {targets[index]}");
+            Debug.Log($"Health now: {targets[index].CurrentHealthPoints}");
 
-    // public void ClearSelectedTargets()
-    // {
-    //     TargetedUnits.Clear();
-    // }
+            _combatUIHandler.UpdateHealthDisplay(targets);
 
-    // public IEnumerator Damage() //temp (only single target)
-    // {
-    //     HandlingAction = true;
+            AudioHandler.PlaySound(self.AudioSource, self.DamageSound);
+            AnimationHandler.PlayAnimation(self.Animator, self.AttackAnimation);
 
-    //     for (int i = 0; i < TargetedUnits.Count; i++)
-    //     {
-    //         if (TargetedUnits[i].IsDead)
-    //             continue;
+            AudioHandler.PlaySound(targets[index].AudioSource, targets[index].TakenDamageSound);
+            AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].AttackAnimation);
 
-    //         TargetedUnits[i].CurrentHealthPoints -= _currentActingUnit.CurrentDamage;
-    //         Debug.Log($"Now targeting: {TargetedUnits[i]}");
-    //         Debug.Log($"Health now: {TargetedUnits[i].CurrentHealthPoints}");
+            yield return null;
 
-    //         _combatUIHandler.UpdateHealthDisplay(TargetedUnits);
+            float animationLength = targets[index].Animator.GetCurrentAnimatorStateInfo(0).length;
 
-    //         AudioHandler.PlaySound(_currentActingUnit.AudioSource, _currentActingUnit.CurrentSoundClip);
-    //         AnimationHandler.PlayAnimation(_currentActingUnit.Animator, _currentActingUnit.CurrentAnimationClip);
+            yield return new WaitForSeconds(animationLength);
 
-    //         yield return new WaitForSeconds(0.2f);
+            AnimationHandler.PlayAnimation(self.Animator, self.DefaultIdleClip);
+            AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].DefaultIdleClip);
+        }
+    }
 
-    //         AnimationHandler.PlayAnimation(_currentActingUnit.Animator, _currentActingUnit.DefaultIdleClip);
-    //     }
+    public static IEnumerator Damage(Unit self, List<StatusEffect> statusEffects)
+    {
+        for (int index = 0; index < statusEffects.Count; index++)
+        {
+            statusEffects[index].RunEffect(self);
+            yield return new WaitForSeconds(1f); // change to match anim length
+        }
 
-    //     HandlingAction = false;
-    // }
+        yield return null;
+    }
 
-    // public IEnumerator Buff()
-    // {
-    //     HandlingAction = true;
+    public static void InflictStatusEffect(List<Unit> targets, StatusEffect statusEffect)
+    {
 
-    //     AudioHandler.PlaySound(_currentActingUnit.AudioSource, _currentActingUnit.CurrentSoundClip);
-    //     yield return new WaitForSeconds(0.8f);
-
-    //     HandlingAction = false;
-    // }
+    }
 }

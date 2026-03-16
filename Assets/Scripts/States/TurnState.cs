@@ -1,37 +1,26 @@
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
 
 public class TurnState : State
 {
-    protected TurnHandler _turnController;
-    protected CombatFunctions CombatFunctions;
+    protected BattleHandler _battleHandler;
     protected CombatUIHandler _combatUIHandler;
-    protected List<Unit> _activeUnits { get { return _turnController.ActiveUnits; } }
-    protected Unit _currentActiveUnit { get { return _turnController.CurrentActiveUnit; } }
+    protected Unit _currentActiveUnit => _battleHandler.CurrentActiveUnit;
 
     public override void Enter()
     {
         base.Enter();
-        InitializeReferences();
     }
 
-    protected virtual void InitializeReferences()
+    public virtual void SetHandlers(BattleHandler battleHandler, CombatUIHandler combatUIHandler)
     {
-        if (_turnController == null)
-            _turnController = FindAnyObjectByType<TurnHandler>();
-
-        if (CombatFunctions == null)
-            CombatFunctions = FindAnyObjectByType<CombatFunctions>();
-
-        if (_combatUIHandler == null)
-            _combatUIHandler = FindAnyObjectByType<CombatUIHandler>();
+        _battleHandler = battleHandler;
+        _combatUIHandler = combatUIHandler;
     }
 
-    protected virtual void TurnTransition()
+    protected virtual IEnumerator CheckStatus()
     {
-        _turnController.UpdateTurnValue();
-        _turnController.DetermineTurn();
-        _combatUIHandler.UpdateTurnDisplay();
+        yield return null;
     }
+
 }

@@ -9,22 +9,19 @@ public class RoomInfo : MonoBehaviour
     RoomData _roomData;
     public List<RoomInfo> NextConnectedRooms = new List<RoomInfo>();
 
-    public void RoomSetup(MapData mapData, RoomData roomData, MapHandler mapHandler, RoomHandler roomHandler)
+    public void RoomSetup(MapData mapData, RoomData roomData, MapHandler mapHandler)
     {
         _roomData = roomData;
         name = _roomData.RoomName;
-        
+
         if (_roomButton == null)
             _roomButton = GetComponent<Button>();
 
         _roomButton.onClick.RemoveAllListeners();
 
-        if (roomHandler != null)
-        {
-            _roomButton.onClick.AddListener(() => roomHandler.GoToRoom(_roomData));
-            mapData.CurrentRow++;
-        }
-            
+        _roomButton.onClick.AddListener(() => RoomHandler.GoToRoom(_roomData));
+        mapData.CurrentRow++;
+
 
         if (mapHandler != null)
             _roomButton.onClick.AddListener(() => mapHandler.EnterRoom(this));

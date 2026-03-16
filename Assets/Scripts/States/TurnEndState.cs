@@ -1,19 +1,15 @@
-using System;
-using System.Collections;
-using UnityEngine;
-
 public class TurnEndState : TurnState
 {
     public override void Enter()
     {
         base.Enter();
 
-        _combatUIHandler.ResetSelectedTargets();
+        _combatUIHandler.ResetTargetsIndicators();
 
-        CombatFunctions.ClearAction();
-        CombatFunctions.StatusCheck();
-        CombatFunctions.ClearSelectedTargets();
+        _currentActiveUnit.ClearAction();
+        _currentActiveUnit.StatusCheck();
+        CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);
 
-        TurnTransition();
+        _battleHandler.ChangeState<TurnStartState>();
     }
 }

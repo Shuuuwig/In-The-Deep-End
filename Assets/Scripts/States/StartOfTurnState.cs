@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class StartOfTurnState : TurnState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void Enter()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        base.Enter();
+        _battleHandler.NextUnitTurn();
     }
 }

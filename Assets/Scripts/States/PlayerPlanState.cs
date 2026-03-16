@@ -1,125 +1,108 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using UnityEngine;
-// using UnityEngine.Events;
-// using UnityEngine.InputSystem;
+using System.Linq;
+using UnityEngine;
 
-// public class PlayerPlanState : PlanState
-// {
-//     protected bool _actionSelected = false;
-//     protected override void AddListeners()
-//     {
-//         base.AddListeners();
-//         InputHandler.NavigateMovesetEvent += OnNavigateMoveset;
-//         InputHandler.ConfirmActionEvent += OnConfirmAction;
-//         InputHandler.EarlyEndActionEvent += OnEarlyEnd;
-//         InputHandler.CancelActionEvent += OnCancelAction;
-//     }
+public class PlayerPlanState : PlanState
+{
+    protected override void AddListeners()
+    {
+        base.AddListeners();
+        InputHandler.NavigateMovesetEvent += OnNavigateMoveset;
+        InputHandler.ConfirmActionEvent += OnConfirmAction;
+        InputHandler.EarlyEndActionEvent += OnEarlyEnd;
+        InputHandler.CancelActionEvent += OnCancelAction;
+    }
 
-//     protected override void RemoveListeners()
-//     {
-//         base.RemoveListeners();
-//         InputHandler.NavigateMovesetEvent -= OnNavigateMoveset;
-//         InputHandler.ConfirmActionEvent -= OnConfirmAction;
-//         InputHandler.EarlyEndActionEvent -= OnEarlyEnd;
-//         InputHandler.CancelActionEvent -= OnCancelAction;
-//     }
+    protected override void RemoveListeners()
+    {
+        base.RemoveListeners();
+        InputHandler.NavigateMovesetEvent -= OnNavigateMoveset;
+        InputHandler.ConfirmActionEvent -= OnConfirmAction;
+        InputHandler.EarlyEndActionEvent -= OnEarlyEnd;
+        InputHandler.CancelActionEvent -= OnCancelAction;
+    }
 
-//     protected void OnNavigateMoveset(object sender, InfoEventArgs<int> e)
-//     {
+    protected void OnNavigateMoveset(object sender, InfoEventArgs<int> e)
+    {
 
-//         if (e.info < 0)
-//         {
-//             _combatUIHandler.CheckCurrentTarget(-1);
-//         }
-//         else if (e.info > 0)
-//         {
-//             _combatUIHandler.CheckCurrentTarget(1);
-//         }
-//     }
+        if (e.info < 0)
+        {
+            _combatUIHandler.CheckCurrentTarget(-1);
+        }
+        else if (e.info > 0)
+        {
+            _combatUIHandler.CheckCurrentTarget(1);
+        }
+    }
 
-//     protected void OnCancelAction(object sender, InfoEventArgs<bool> e)
-//     {
-//         if (e.info == true)
-//         {
-//             if (CombatFunctions.ActionUsed == null)
-//                 return;
+    protected void OnCancelAction(object sender, InfoEventArgs<bool> e)
+    {
+        if (e.info == true)
+        {
+            _currentActiveUnit.CurrentActionCount = 0;
 
-//             _currentActiveUnit.CurrentActionCount = 0;
+            _currentActiveUnit.ResetActionCount();
+            _currentActiveUnit.ClearAction();
 
-//             CombatFunctions.ClearAction();
-//             CombatFunctions.ResetActionCount();
-//             CombatFunctions.ClearSelectedTargets();
+            _combatUIHandler.HideCurrentIndicator();
+            _combatUIHandler.ResetTargetsIndicators();
 
-//             _combatUIHandler.HideCurrentIndicator();
-//             _combatUIHandler.ResetSelectedTargets();
-//             Debug.Log("Target Canceled");
+            Debug.Log("Target Canceled - Returning to Move Selection");
 
-//             LoadSelections();
+            LoadSelections();
+        }
+    }
 
-//             _actionSelected = false;
-//         }
-//     }
+    protected void OnConfirmAction(object sender, InfoEventArgs<bool> e)
+    {
+        if (_currentActiveUnit.ActionUsed == null)
+            return;
 
-//     protected void OnConfirmAction(object sender, InfoEventArgs<bool> e)
-//     {
-//         if (!_actionSelected)
-//         {
-//             _actionSelected = true;
-//         }
-//         else if (_actionSelected)
-//         {
-//             if (CombatFunctions.ActionUsed == null)
-//                 return;
+        Debug.Log("Target Confirmed");
 
-//             Debug.Log("Target Confirmed");
+        _currentActiveUnit.CurrentActionCount++;
+        _combatUIHandler.SaveSelectedTargets();
 
-//             ++_currentActiveUnit.CurrentActionCount;
+        if (_currentActiveUnit.CurrentActionCount >= _currentActiveUnit.MaxActionCount)
+        {
+            Debug.Log("All targets selected. Starting action execution.");
 
-//             CombatFunctions.SaveSelectedTargets(_combatUIHandler.CurrentTargetedPosition.GetComponentInChildren<Unit>());
-//             _combatUIHandler.SaveSelectedTargets();
+            _combatUIHandler.HideCurrentIndicator();
+            _combatUIHandler.HideSelections();
 
-//             if (_currentActiveUnit.CurrentActionCount >= _currentActiveUnit.MaxActionCount)
-//             {
-//                 Debug.Log("Max Action Count Reached");
-//                 _actionSelected = false;
+            _battleHandler.ChangeState<PlayerActionState>();
+        }
+        else
+        {
+            Debug.Log($"Target saved. {_currentActiveUnit.MaxActionCount - _currentActiveUnit.CurrentActionCount} hits remaining.");
+        }
+    }
 
-//                 _combatUIHandler.HideCurrentIndicator();
-//                 _combatUIHandler.ResetSelectedTargets();
-//                 CombatFunctions.ResetActionCount();
+    protected void OnEarlyEnd(object sender, InfoEventArgs<bool> e)
+    {
+        if (_currentActiveUnit.CurrentActionCount < 1)
+            return;
 
-//                 _turnController.ChangeState<ActionState>();
-//             }
-//         }
-//     }
+        Debug.Log("Action Ended Early - Proceeding with current targets");
 
-//     protected void OnEarlyEnd(object sender, InfoEventArgs<bool> e)
-//     {
-//         if (_currentActiveUnit.CurrentActionCount < 1)
-//             return;
+        _combatUIHandler.HideCurrentIndicator();
+        _combatUIHandler.HideSelections();
 
-//         Debug.Log("Action Ended Early");
-//         _actionSelected = false;
+        _battleHandler.ChangeState<PlayerActionState>();
+    }
 
-//         _combatUIHandler.HideCurrentIndicator();
-//         _combatUIHandler.ResetSelectedTargets();
-//         CombatFunctions.ResetActionCount();
+    protected override void LoadSelections()
+    {
+        base.LoadSelections();
+        Debug.Log("Loading Selections");
 
-//         _turnController.ChangeState<ActionState>();
-//     }
+        _combatUIHandler.SetupSelections(_currentActiveUnit.Moveset.Count, _currentActiveUnit.Moveset, SelectionChosen);
+    }
 
-//     protected override void LoadSelections()
-//     {
-//         base.LoadSelections(); //Refer to parents class
-//         Debug.Log("Loading Selections");
-//         _combatUIHandler.SetupSelections(_currentActiveUnit.Moveset.Count, _currentActiveUnit.Moveset, SelectionChosen);
-//     }
+    protected override void SelectionChosen()
+    {
+        base.SelectionChosen();
 
-//     protected override void SelectionChosen()
-//     {
-//         base.SelectionChosen();
-//         _combatUIHandler.HideMovesetSelections(_currentActiveUnit.Moveset.Count);
-//         _combatUIHandler.ShowCurrentIndicator();
-//     }
-// }
+        _combatUIHandler.HideSelections();
+        _combatUIHandler.ShowCurrentIndicator();
+    }
+}
