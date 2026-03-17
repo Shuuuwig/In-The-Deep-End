@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522f3ff48d7bef647a19c166448f55c7, type: 3}
   m_Name: BattleData1
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
-  RoundLength: 200
   NumberOfWaves: 1
-  PlayerUnitsInBattle: []
-  EnemyUnitsInBattle: []
+  EnemyUnitsInBattle:
+  - {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}
+  - {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}

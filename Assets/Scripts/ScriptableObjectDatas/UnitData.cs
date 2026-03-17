@@ -5,13 +5,9 @@ using UnityEngine;
 public class UnitData : ScriptableObject
 {
     public float MaxHealthPoints;
-    public float CurrentHealthPoints;
     public float MaxResolvePoints;
-    public float CurrentResolvePoints;
     public float BaseSpeed;
-    public float CurrentSpeed;
     public float BaseDamage;
-    public float CurrentDamage;
     public Sprite CharacterSprite;
     public List<Sprite> CharacterIcons = new List<Sprite>();
     public List<Sprite> MarkedTargetIndicators = new List<Sprite>();

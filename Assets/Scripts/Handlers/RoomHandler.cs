@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class RoomHandler
+public class RoomHandler : MonoBehaviour
 {
+    public static GameObject _Instance;
+
     public static void GoToRoom (RoomData roomData)
     {
         SceneManager.LoadScene(roomData.RoomName);

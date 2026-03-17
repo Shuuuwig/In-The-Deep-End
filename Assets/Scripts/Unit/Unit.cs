@@ -20,16 +20,15 @@ public abstract class Unit : MonoBehaviour
     public Animator Animator => _animator;
 
     [Header("Battle Identity")]
-    public int SpawnIndex;
-    public bool IsPlayer;
-    public List<StatusEffect> _statusEffects = new List<StatusEffect>();
+    [HideInInspector] public int SpawnIndex;
+    [HideInInspector] public bool IsPlayer;
+    [HideInInspector] public List<StatusEffect> _statusEffects = new List<StatusEffect>();
 
-    [Header("Growth Stats (Live Maxes)")]
-    public int CurrentLevel = 1;
-    public float MaxHealthPoints; // No longer just a pointer to _unitData
-    public float MaxResolvePoints;
-    public float BaseSpeed;
-    public float BaseDamage;
+    [Header("Growth Stats")]
+    public float MaxHealthPoints { get; protected set; }
+    public float MaxResolvePoints { get; protected set; }
+    public float BaseSpeed { get; protected set; }
+    public float BaseDamage { get; protected set; }
 
     [Header("Live Battle State")]
     [HideInInspector] public float CurrentHealthPoints;
@@ -93,18 +92,14 @@ public abstract class Unit : MonoBehaviour
 
     public virtual void LevelUp(float hpGain, float dmgGain, float speedGain)
     {
-        CurrentLevel++;
-
         MaxHealthPoints += hpGain;
         BaseDamage += dmgGain;
         BaseSpeed += speedGain;
 
         CurrentHealthPoints = MaxHealthPoints;
-
-        Debug.Log($"{gameObject.name} leveled up to {CurrentLevel}!");
     }
 
-    
+
 
     protected abstract void MovesetHandler();
     protected abstract void UnitUniqueUI();

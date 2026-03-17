@@ -1,16 +1,43 @@
 using UnityEngine;
 
-public class EnemyCrewmate : MonoBehaviour
+public class EnemyCrewmate : Unit
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected override void InitializeUnit()
+    {
+        base.InitializeUnit();
+
+        UnitUniqueUI();
+    }
+
+    protected override void MovesetHandler()
+    {
+        _moveset.Clear();
+
+        
+    }
+
+    protected override void UnitUniqueUI()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void ResetActionCount()
     {
         
+    }
+
+    public override void ClearAction()
+    {
+        ActionUsed = null;
+    }
+
+    public override void StatusCheck()
+    {
+        MovesetHandler();
+    }
+
+    public override bool CanCounter()
+    {
+        return false;
     }
 }

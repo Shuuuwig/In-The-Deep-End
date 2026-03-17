@@ -5,6 +5,7 @@ public class BattleHandler : StateMachine
 {
     [Header("Battle Setup Data")]
     [SerializeField] protected RoomData _roomData;
+    protected TeamData _teamData;
     [SerializeField] protected List<BattleData> Tier1Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> Tier2Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> Tier3Battle = new List<BattleData>();
@@ -56,16 +57,25 @@ public class BattleHandler : StateMachine
     public void InitializeBattle()
     {
         _battleData = CombatFunctions.SelectBattleData(Tier1Battle, Tier2Battle, Tier3Battle);
+        _teamData = Resources.Load<TeamData>("TeamData/PlayerTeamData");
 
-        for (int i = 0; i < _battleData.PlayerUnitsInBattle.Count; i++)
+        for (int i = 0; i < _teamData.UnitsInParty.Count; i++)
         {
-            if (_battleData.PlayerUnitsInBattle[i] == null) break;
+            Unit playerUnit = _teamData.UnitsInParty[i].GetComponent<Unit>();
 
-            GameObject playerObject = Instantiate(_battleData.PlayerUnitsInBattle[i], _playerSpawnPos[i].transform);
+            if (_teamData.UnitsInParty[i] == null)
+                break;
+
+            if (playerUnit.IsDead())
+            {
+                Debug.Log($"{playerUnit.name} is dead with {playerUnit.CurrentHealthPoints} health");
+                continue;
+            }
+
+
+            GameObject playerObject = Instantiate(_teamData.UnitsInParty[i], _playerSpawnPos[i].transform);
 
             playerObject.transform.localPosition = new Vector3(0, 0, 10);
-
-            Unit playerUnit = playerObject.GetComponent<Unit>();
 
             playerUnit.SpawnIndex = i;
             playerUnit.IsPlayer = true;
@@ -75,7 +85,8 @@ public class BattleHandler : StateMachine
 
         for (int i = 0; i < _battleData.EnemyUnitsInBattle.Count; i++)
         {
-            if (_battleData.EnemyUnitsInBattle[i] == null) break;
+            if (_battleData.EnemyUnitsInBattle[i] == null)
+                break;
 
             GameObject enemyObject = Instantiate(_battleData.EnemyUnitsInBattle[i], _enemySpawnPos[i].transform);
             enemyObject.transform.localPosition = new Vector3(0, 0, 10);

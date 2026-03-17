@@ -15,4 +15,4 @@ MonoBehaviour:
   MapSeed: 0
   NumberOfRows: 0
   CurrentRoom: 0
-  CurrentRow: 0
+  CurrentRow: 9

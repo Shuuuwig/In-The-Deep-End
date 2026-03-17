@@ -7,7 +7,7 @@ public class PlayerGunslingerUnit : Unit
 {
     protected int _maxAmmo;
     protected int _currentAmmo;
-    
+
     [Header("Gunslinger UI")]
     protected Canvas _canvas;
     protected GameObject _passiveUI;
@@ -31,9 +31,9 @@ public class PlayerGunslingerUnit : Unit
 
         if (_currentAmmo > 0)
         {
-            _moveset.Add(ChamberShots, _actionDatas[0]);
+            _moveset.Add(Multishot, _actionDatas[0]);
         }
-        
+
         _moveset.Add(Reload, _actionDatas[1]);
     }
 
@@ -47,17 +47,17 @@ public class PlayerGunslingerUnit : Unit
         }
 
         RectTransform rect = _passiveUI.GetComponent<RectTransform>();
-        
+
         rect.anchorMin = new Vector2(0, 0);
         rect.anchorMax = new Vector2(0, 0);
         rect.pivot = new Vector2(0, 0);
-        
-        rect.anchoredPosition = new Vector2(50, 50); 
+
+        rect.anchoredPosition = new Vector2(50, 50);
         rect.sizeDelta = new Vector2(200, 50);
 
-        _ammoNumber.fontSize = 24f; 
+        _ammoNumber.fontSize = 24f;
         _ammoNumber.alignment = TextAlignmentOptions.BottomLeft;
-        
+
         UpdateAmmoText();
     }
 
@@ -87,7 +87,7 @@ public class PlayerGunslingerUnit : Unit
         {
             _currentAmmo = _maxAmmo;
         }
-        else if (ActionUsed == ChamberShots)
+        else if (ActionUsed == Multishot)
         {
             _currentAmmo -= CurrentActionCount;
         }
@@ -104,9 +104,20 @@ public class PlayerGunslingerUnit : Unit
         }
     }
 
-    protected void ChamberShots()
+    protected void Reload()
     {
-        ActionUsed = ChamberShots;
+        ActionUsed = Reload;
+
+        CurrentDamage = 0;
+        _maxActionCount = _actionDatas[1].MaxActionCount;
+
+        DamageSound = _audioClips[1];
+        AttackAnimation = _animationClips[1];
+    }
+
+    protected void Multishot()
+    {
+        ActionUsed = Multishot;
 
         if (_currentAmmo < _actionDatas[0].MaxActionCount)
         {
@@ -122,14 +133,5 @@ public class PlayerGunslingerUnit : Unit
         AttackAnimation = _animationClips[1];
     }
 
-    protected void Reload()
-    {
-        ActionUsed = Reload;
 
-        CurrentDamage = 0;
-        _maxActionCount = _actionDatas[1].MaxActionCount;
-
-        DamageSound = _audioClips[1];
-        AttackAnimation = _animationClips[1];
-    }
 }

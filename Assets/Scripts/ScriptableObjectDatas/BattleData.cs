@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class BattleData : ScriptableObject
 {
     public int NumberOfWaves;
-    public List<GameObject> PlayerUnitsInBattle = new List<GameObject>();
     public List<GameObject> EnemyUnitsInBattle = new List<GameObject>();
 
 }
