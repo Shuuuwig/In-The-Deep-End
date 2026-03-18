@@ -62,6 +62,7 @@ public class CombatUIHandler : MonoBehaviour
 
         foreach (Unit unit in _battleHandler.ActiveUnits)
         {
+            Debug.Log(unit);
             GameObject parentPos = unit.transform.parent.gameObject;
 
             for (int i = 0; i < _playerSpawnPos.Count; i++)

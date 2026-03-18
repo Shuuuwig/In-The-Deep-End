@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyCrewmate : Unit
 {
-    protected override void InitializeUnit()
+    public override void InitializeUnit()
     {
         base.InitializeUnit();
 

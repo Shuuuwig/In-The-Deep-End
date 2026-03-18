@@ -58,8 +58,7 @@ public abstract class Unit : MonoBehaviour
     {
         if (_animationClips != null && _animationClips.Count > 0)
             DefaultIdleClip = _animationClips[0];
-
-        InitializeUnit();
+            
         MovesetHandler();
     }
 
@@ -75,9 +74,10 @@ public abstract class Unit : MonoBehaviour
         ActionUsed = null;
     }
 
-    protected virtual void InitializeUnit()
+    public virtual void InitializeUnit()
     {
         MaxHealthPoints = _unitData.MaxHealthPoints;
+        
         MaxResolvePoints = _unitData.MaxResolvePoints;
         BaseSpeed = _unitData.BaseSpeed;
         BaseDamage = _unitData.BaseDamage;
@@ -88,6 +88,7 @@ public abstract class Unit : MonoBehaviour
 
         _baseTurnValue = BattleHandler.TurnTVLength / BaseSpeed;
         CurrentTurnValue = _baseTurnValue;
+        Debug.Log(CurrentHealthPoints);
     }
 
     public virtual void LevelUp(float hpGain, float dmgGain, float speedGain)

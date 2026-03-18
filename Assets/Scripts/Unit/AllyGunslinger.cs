@@ -13,7 +13,7 @@ public class PlayerGunslingerUnit : Unit
     protected GameObject _passiveUI;
     protected TMP_Text _ammoNumber;
 
-    protected override void InitializeUnit()
+    public override void InitializeUnit()
     {
         base.InitializeUnit();
 

@@ -62,6 +62,7 @@ public class BattleHandler : StateMachine
         for (int i = 0; i < _teamData.UnitsInParty.Count; i++)
         {
             Unit playerUnit = _teamData.UnitsInParty[i].GetComponent<Unit>();
+            playerUnit.InitializeUnit();
 
             if (_teamData.UnitsInParty[i] == null)
                 break;
@@ -71,7 +72,6 @@ public class BattleHandler : StateMachine
                 Debug.Log($"{playerUnit.name} is dead with {playerUnit.CurrentHealthPoints} health");
                 continue;
             }
-
 
             GameObject playerObject = Instantiate(_teamData.UnitsInParty[i], _playerSpawnPos[i].transform);
 
