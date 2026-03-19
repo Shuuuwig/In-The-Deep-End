@@ -40,13 +40,14 @@ public class CombatUIHandler : MonoBehaviour
     protected List<GameObject> _playerSpawnPos => _battleHandler.PlayerSpawnPos;
     protected List<GameObject> _enemySpawnPos => _battleHandler.EnemySpawnPos;
 
-    protected void Start()
+    protected void Awake()
     {
         foreach (GameObject selection in _movesetSelections)
         {
             Button button = selection.GetComponent<Button>();
             _movesetButtons.Add(button);
             _movesetButtonText.Add(button.GetComponentInChildren<TMP_Text>());
+            Debug.Log($"sss {_movesetButtons}");
         }
 
         foreach (GameObject display in _turnValueDisplay)
@@ -57,33 +58,29 @@ public class CombatUIHandler : MonoBehaviour
     }
 
     public void InitializeHealthDisplay()
+{
+    ShowHealthbars();
+
+    foreach (Unit unit in _battleHandler.ActiveUnits)
     {
-        ShowHealthbars();
+        int index = unit.SpawnIndex;
 
-        foreach (Unit unit in _battleHandler.ActiveUnits)
+        if (unit.IsPlayer)
         {
-            Debug.Log(unit);
-            GameObject parentPos = unit.transform.parent.gameObject;
-
-            for (int i = 0; i < _playerSpawnPos.Count; i++)
+            if (index >= 0 && index < _playerHealthbars.Count)
             {
-                if (parentPos == _playerSpawnPos[i])
-                {
-                    SetupHealthSlider(_playerHealthbars[i], unit);
-                    break;
-                }
+                SetupHealthSlider(_playerHealthbars[index], unit);
             }
-
-            for (int i = 0; i < _enemySpawnPos.Count; i++)
+        }
+        else
+        {
+            if (index >= 0 && index < _enemyHealthbars.Count)
             {
-                if (parentPos == _enemySpawnPos[i])
-                {
-                    SetupHealthSlider(_enemyHealthbars[i], unit);
-                    break;
-                }
+                SetupHealthSlider(_enemyHealthbars[index], unit);
             }
         }
     }
+}
 
     private void SetupHealthSlider(Slider slider, Unit unit)
     {

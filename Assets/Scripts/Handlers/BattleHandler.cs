@@ -85,13 +85,14 @@ public class BattleHandler : StateMachine
 
         for (int i = 0; i < _battleData.EnemyUnitsInBattle.Count; i++)
         {
+            Unit enemyUnit = _battleData.EnemyUnitsInBattle[i].GetComponent<Unit>();
+            enemyUnit.InitializeUnit();
+
             if (_battleData.EnemyUnitsInBattle[i] == null)
                 break;
 
             GameObject enemyObject = Instantiate(_battleData.EnemyUnitsInBattle[i], _enemySpawnPos[i].transform);
             enemyObject.transform.localPosition = new Vector3(0, 0, 10);
-
-            Unit enemyUnit = enemyObject.GetComponent<Unit>();
 
             enemyUnit.SpawnIndex = i;
             enemyUnit.IsPlayer = false;
@@ -117,9 +118,15 @@ public class BattleHandler : StateMachine
         _currentActiveUnit.StatusCheck();
 
         if (turnType == TurnType.PlayerTurn)
+        {
+            Debug.Log("Player turn");
             ChangeState<PlayerPlanState>();
-        if (turnType == TurnType.EnemyTurn)
-            ChangeState<PlayerPlanState>();
+        }
+        else if (turnType == TurnType.EnemyTurn)
+        {
+            Debug.Log("Enemu turn");
+            ChangeState<EnemyPlanState>();
+        }
         else
             Debug.Log("Noones turn");
     }
