@@ -29,12 +29,14 @@ public class PlayerGunslingerUnit : Unit
     {
         _moveset.Clear();
 
+        _moveset.Add(Reload, _actionDatas[0]);
+        
         if (_currentAmmo > 0)
         {
-            _moveset.Add(Multishot, _actionDatas[0]);
+            _moveset.Add(Multishot, _actionDatas[1]);
         }
 
-        _moveset.Add(Reload, _actionDatas[1]);
+
     }
 
     protected override void UnitUniqueUI()
@@ -111,8 +113,8 @@ public class PlayerGunslingerUnit : Unit
         CurrentDamage = 0;
         _maxActionCount = _actionDatas[1].MaxActionCount;
 
-        DamageSound = _audioClips[1];
-        AttackAnimation = _animationClips[1];
+        //DamageSound = _audioClips[1];
+        //AttackAnimation = _animationClips[1];
     }
 
     protected void Multishot()
@@ -129,8 +131,8 @@ public class PlayerGunslingerUnit : Unit
         }
 
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
-        DamageSound = _audioClips[0];
-        AttackAnimation = _animationClips[1];
+        //DamageSound = _audioClips[0];
+        //AttackAnimation = _animationClips[1];
     }
 
 

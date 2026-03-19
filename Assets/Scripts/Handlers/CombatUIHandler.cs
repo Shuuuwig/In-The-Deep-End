@@ -58,29 +58,29 @@ public class CombatUIHandler : MonoBehaviour
     }
 
     public void InitializeHealthDisplay()
-{
-    ShowHealthbars();
-
-    foreach (Unit unit in _battleHandler.ActiveUnits)
     {
-        int index = unit.SpawnIndex;
+        ShowHealthbars();
 
-        if (unit.IsPlayer)
+        foreach (Unit unit in _battleHandler.ActiveUnits)
         {
-            if (index >= 0 && index < _playerHealthbars.Count)
+            int index = unit.SpawnIndex;
+
+            if (unit.IsPlayer)
             {
-                SetupHealthSlider(_playerHealthbars[index], unit);
+                if (index >= 0 && index < _playerHealthbars.Count)
+                {
+                    SetupHealthSlider(_playerHealthbars[index], unit);
+                }
             }
-        }
-        else
-        {
-            if (index >= 0 && index < _enemyHealthbars.Count)
+            else
             {
-                SetupHealthSlider(_enemyHealthbars[index], unit);
+                if (index >= 0 && index < _enemyHealthbars.Count)
+                {
+                    SetupHealthSlider(_enemyHealthbars[index], unit);
+                }
             }
         }
     }
-}
 
     private void SetupHealthSlider(Slider slider, Unit unit)
     {
@@ -112,6 +112,7 @@ public class CombatUIHandler : MonoBehaviour
     {
         foreach (Unit unit in _battleHandler.ActiveUnits)
         {
+            Debug.Log($"THIS UNIT {unit}");
             if (unit.IsDead())
                 continue;
 
@@ -231,11 +232,12 @@ public class CombatUIHandler : MonoBehaviour
                 return;
         }
 
-        _currentTargetIndicator = _currentTargetedPosition.GetComponent<SpriteRenderer>();
+        _currentTargetIndicator = _currentTargetedPosition.GetComponentInChildren<SpriteRenderer>();
 
         if (_currentTargetIndicator != null)
         {
             _currentTargetIndicator.enabled = true;
+            Debug.Log("INDICATOR ENABLED");
         }
     }
 
@@ -287,34 +289,34 @@ public class CombatUIHandler : MonoBehaviour
     }
 
     public void SaveSelectedTargets()
-{
-    Unit targetedUnit = _currentTargetedPosition.GetComponentInChildren<Unit>();
-
-    if (targetedUnit != null)
     {
-        _battleHandler.TargetedUnits.Add(targetedUnit);
+        Unit targetedUnit = _currentTargetedPosition.GetComponentInChildren<Unit>();
 
-        int index = targetedUnit.SpawnIndex;
-        SpriteRenderer markedTargetIndicator = _markedTargetIndicators[index];
-
-        Debug.Log($"Target Saved: {targetedUnit.name}. Total Hits queued: {_battleHandler.TargetedUnits.Count}");
-
-        if (markedTargetIndicator.enabled)
+        if (targetedUnit != null)
         {
-            int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(markedTargetIndicator.sprite);
+            _battleHandler.TargetedUnits.Add(targetedUnit);
 
-            if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
+            int index = targetedUnit.SpawnIndex;
+            SpriteRenderer markedTargetIndicator = _markedTargetIndicators[index];
+
+            Debug.Log($"Target Saved: {targetedUnit.name}. Total Hits queued: {_battleHandler.TargetedUnits.Count}");
+
+            if (markedTargetIndicator.enabled)
             {
-                markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
+                int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(markedTargetIndicator.sprite);
+
+                if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
+                {
+                    markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
+                }
+            }
+            else
+            {
+                markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
+                markedTargetIndicator.enabled = true;
             }
         }
-        else
-        {
-            markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
-            markedTargetIndicator.enabled = true;
-        }
     }
-}
 
     public void ResetTargetsIndicators()
     {
