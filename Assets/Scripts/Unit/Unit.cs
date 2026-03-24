@@ -35,7 +35,7 @@ public abstract class Unit : MonoBehaviour
     [HideInInspector] public float CurrentSpeed;
     [HideInInspector] public float CurrentDamage;
     [HideInInspector] public float CurrentTurnValue;
-    [HideInInspector] public int CurrentActionCount;
+    public int CurrentActionCount;
 
     [Header("Cached Assets")]
     [HideInInspector] public AnimationClip DefaultIdleClip;
@@ -64,7 +64,7 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void Update() { }
 
-    public virtual void ResetActionCount()
+    public virtual void CheckActionCount()
     {
         CurrentActionCount = 0;
     }
@@ -76,6 +76,7 @@ public abstract class Unit : MonoBehaviour
 
     public virtual void InitializeUnit()
     {
+        CurrentActionCount = 0;
         MaxHealthPoints = _unitData.MaxHealthPoints;
         
         MaxResolvePoints = _unitData.MaxResolvePoints;
@@ -88,7 +89,6 @@ public abstract class Unit : MonoBehaviour
 
         _baseTurnValue = BattleHandler.TurnTVLength / BaseSpeed;
         CurrentTurnValue = _baseTurnValue;
-        Debug.Log(CurrentHealthPoints);
     }
 
     public virtual void LevelUp(float hpGain, float dmgGain, float speedGain)

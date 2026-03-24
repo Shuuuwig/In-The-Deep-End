@@ -16,11 +16,13 @@ public class PlayerGunslingerUnit : Unit
     public override void InitializeUnit()
     {
         base.InitializeUnit();
-
-        _maxAmmo = _actionDatas[0].MaxActionCount;
+        _maxActionCount = _actionDatas[1].MaxActionCount;
+        Debug.Log($"MAX COUNT {_maxActionCount}");
+        _maxAmmo = _maxActionCount;
         _currentAmmo = _maxAmmo;
 
-        if (_canvas == null) _canvas = FindAnyObjectByType<Canvas>();
+        if (_canvas == null)
+            _canvas = FindAnyObjectByType<Canvas>();
 
         UnitUniqueUI();
     }
@@ -30,7 +32,7 @@ public class PlayerGunslingerUnit : Unit
         _moveset.Clear();
 
         _moveset.Add(Reload, _actionDatas[0]);
-        
+
         if (_currentAmmo > 0)
         {
             _moveset.Add(Multishot, _actionDatas[1]);
@@ -63,7 +65,7 @@ public class PlayerGunslingerUnit : Unit
         UpdateAmmoText();
     }
 
-    public override void ResetActionCount()
+    public override void CheckActionCount()
     {
         AmmoCheck();
     }
@@ -88,13 +90,13 @@ public class PlayerGunslingerUnit : Unit
         if (ActionUsed == Reload)
         {
             _currentAmmo = _maxAmmo;
+            CurrentActionCount = 0;
         }
         else if (ActionUsed == Multishot)
         {
             _currentAmmo -= CurrentActionCount;
         }
 
-        _currentAmmo = Mathf.Clamp(_currentAmmo, 0, _maxAmmo);
         UpdateAmmoText();
     }
 
@@ -112,6 +114,7 @@ public class PlayerGunslingerUnit : Unit
 
         CurrentDamage = 0;
         _maxActionCount = _actionDatas[1].MaxActionCount;
+        _currentAmmo = _maxAmmo;
 
         //DamageSound = _audioClips[1];
         //AttackAnimation = _animationClips[1];
@@ -121,13 +124,13 @@ public class PlayerGunslingerUnit : Unit
     {
         ActionUsed = Multishot;
 
-        if (_currentAmmo < _actionDatas[0].MaxActionCount)
+        if (_currentAmmo < _actionDatas[1].MaxActionCount)
         {
             _maxActionCount = _currentAmmo;
         }
         else
         {
-            _maxActionCount = _actionDatas[0].MaxActionCount;
+            _maxActionCount = _actionDatas[1].MaxActionCount;
         }
 
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;

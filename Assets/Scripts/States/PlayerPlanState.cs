@@ -40,7 +40,7 @@ public class PlayerPlanState : PlanState
         {
             _currentActiveUnit.CurrentActionCount = 0;
 
-            _currentActiveUnit.ResetActionCount();
+            _currentActiveUnit.CheckActionCount();
             _currentActiveUnit.ClearAction();
 
             _combatUIHandler.HideCurrentIndicator();
@@ -58,9 +58,10 @@ public class PlayerPlanState : PlanState
             return;
 
         Debug.Log("Target Confirmed");
-
+        Debug.Log($"UNIT NOW: {_currentActiveUnit}");
         _currentActiveUnit.CurrentActionCount++;
         _combatUIHandler.SaveSelectedTargets();
+        Debug.Log($"Current count: {_currentActiveUnit.CurrentActionCount}, Max count: {_currentActiveUnit.MaxActionCount}");
 
         if (_currentActiveUnit.CurrentActionCount >= _currentActiveUnit.MaxActionCount)
         {
@@ -73,6 +74,7 @@ public class PlayerPlanState : PlanState
         }
         else
         {
+            _currentActiveUnit.CheckActionCount();
             Debug.Log($"Target saved. {_currentActiveUnit.MaxActionCount - _currentActiveUnit.CurrentActionCount} hits remaining.");
         }
     }

@@ -31,13 +31,6 @@ public static class TurnFunctions
     public static void InitialTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
                                      GameObject playerGraveyard, GameObject enemyGraveyard)
     {
-        foreach (Unit unit in activeUnits)
-        {
-            unit.CurrentTurnValue = unit.BaseTurnValue;
-        }
-
-        SortActiveUnits(activeUnits, playerUnitTag, enemyUnitTag, playerGraveyard, enemyGraveyard);
-
         float fastestUnitValue = activeUnits[0].CurrentTurnValue;
 
         for (int index = 0; index < activeUnits.Count; index++)
@@ -46,6 +39,8 @@ public static class TurnFunctions
 
             Debug.Log($"{activeUnits[index].gameObject.name} {index} = {activeUnits[index].CurrentTurnValue} (Initial)");
         }
+
+        SortActiveUnits(activeUnits, playerUnitTag, enemyUnitTag, playerGraveyard, enemyGraveyard);
     }
 
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,

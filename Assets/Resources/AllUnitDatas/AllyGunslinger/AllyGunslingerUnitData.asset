@@ -20,7 +20,12 @@ MonoBehaviour:
   CharacterIcons:
   - {fileID: 0}
   MarkedTargetIndicators:
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 07c2560973473614c82c18820ecb209a, type: 3}
+  - {fileID: 21300000, guid: ef6829faf2396254ea4c7948d1e867d3, type: 3}
+  - {fileID: 21300000, guid: 835e89ce6d7d72e44af964600991fad6, type: 3}
+  - {fileID: 21300000, guid: b834bbd90dd70e34bb34f7744014887e, type: 3}
+  - {fileID: 21300000, guid: 1dd626d78410cf148abd36d4e02f635a, type: 3}
+  - {fileID: 21300000, guid: 9adc647f8907ffe46b4228fc15462aaa, type: 3}
   AudioClips:
   - {fileID: 0}
   AnimationClips:

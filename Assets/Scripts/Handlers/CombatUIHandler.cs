@@ -111,10 +111,12 @@ public class CombatUIHandler : MonoBehaviour
     public void ShowHealthbars()
     {
         foreach (Unit unit in _battleHandler.ActiveUnits)
-        {
-            Debug.Log($"THIS UNIT {unit}");
+        {        
             if (unit.IsDead())
+            {
+                Debug.Log($"THIS UNIT {unit} IS DEAD");
                 continue;
+            }                
 
             if (unit.IsPlayer)
             {
@@ -232,7 +234,7 @@ public class CombatUIHandler : MonoBehaviour
                 return;
         }
 
-        _currentTargetIndicator = _currentTargetedPosition.GetComponentInChildren<SpriteRenderer>();
+        _currentTargetIndicator = _currentTargetedPosition.GetComponent<SpriteRenderer>();
 
         if (_currentTargetIndicator != null)
         {
@@ -307,6 +309,7 @@ public class CombatUIHandler : MonoBehaviour
 
                 if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
                 {
+                    Debug.Log("Changing mark");
                     markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
                 }
             }

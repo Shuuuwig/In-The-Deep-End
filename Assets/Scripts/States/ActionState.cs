@@ -9,7 +9,7 @@ public class ActionState : TurnState
     public override void Enter()
     {
         base.Enter();
-        StartCoroutine(HandleActions());
+         StartCoroutine(HandleActions());
     }
 
     protected override void AddListeners()
@@ -22,7 +22,7 @@ public class ActionState : TurnState
         base.RemoveListeners();
     }
 
-    protected IEnumerator HandleActions()
+    protected virtual IEnumerator HandleActions()
     {
         // 1. Get the data for the action being used
         ActionData actionDataUsed = _currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed];

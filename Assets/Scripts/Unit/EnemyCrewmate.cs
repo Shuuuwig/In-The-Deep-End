@@ -21,7 +21,7 @@ public class EnemyCrewmate : Unit
         
     }
 
-    public override void ResetActionCount()
+    public override void CheckActionCount()
     {
         
     }

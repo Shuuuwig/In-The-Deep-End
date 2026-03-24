@@ -21,7 +21,7 @@ public class AllyCaptain : Unit
         
     }
 
-    public override void ResetActionCount()
+    public override void CheckActionCount()
     {
         
     }

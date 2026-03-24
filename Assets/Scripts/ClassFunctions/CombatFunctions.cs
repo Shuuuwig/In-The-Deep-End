@@ -5,17 +5,23 @@ using UnityEngine.Events;
 
 public static class CombatFunctions
 {
-    public static bool IsAllyTargeting(ActionCategory actionType)
+    public static bool IsAllyTargeting(ActionCategory actionCategory)
     {
-        switch (actionType)
+        switch (actionCategory)
         {
-
+            case ActionCategory.Heal:
+                return true;
         }
         return false;
     }
 
-    public static bool IsEnemyTargeting(ActionCategory actionType)
+    public static bool IsEnemyTargeting(ActionCategory actionCategory)
     {
+        switch (actionCategory)
+        {
+            case ActionCategory.Attack:
+                return true;
+        }
         return false;
     }
 
@@ -23,7 +29,7 @@ public static class CombatFunctions
 
     public static void Initialize(CombatUIHandler combatUIHandler)
     {
-        combatUIHandler = _combatUIHandler;
+        _combatUIHandler = combatUIHandler;
     }
 
     public static BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> tier3Battle)
@@ -38,7 +44,7 @@ public static class CombatFunctions
 
     public static void ResetActionCount(Unit currentActiveUnit)
     {
-        currentActiveUnit.ResetActionCount();
+        currentActiveUnit.CheckActionCount();
     }
 
     public static List<Unit> SaveSelectedTargets(List<Unit> targetedUnits, Unit targetedUnit)
@@ -66,20 +72,20 @@ public static class CombatFunctions
 
             _combatUIHandler.UpdateHealthDisplay(targets);
 
-            AudioHandler.PlaySound(self.AudioSource, self.DamageSound);
-            AnimationHandler.PlayAnimation(self.Animator, self.AttackAnimation);
+            // AudioHandler.PlaySound(self.AudioSource, self.DamageSound);
+            // AnimationHandler.PlayAnimation(self.Animator, self.AttackAnimation);
 
-            AudioHandler.PlaySound(targets[index].AudioSource, targets[index].TakenDamageSound);
-            AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].AttackAnimation);
+            // AudioHandler.PlaySound(targets[index].AudioSource, targets[index].TakenDamageSound);
+            // AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].AttackAnimation);
 
             yield return null;
 
-            float animationLength = targets[index].Animator.GetCurrentAnimatorStateInfo(0).length;
+            // float animationLength = targets[index].Animator.GetCurrentAnimatorStateInfo(0).length;
 
-            yield return new WaitForSeconds(animationLength);
+            // yield return new WaitForSeconds(animationLength);
 
-            AnimationHandler.PlayAnimation(self.Animator, self.DefaultIdleClip);
-            AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].DefaultIdleClip);
+            // AnimationHandler.PlayAnimation(self.Animator, self.DefaultIdleClip);
+            // AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].DefaultIdleClip);
         }
     }
 

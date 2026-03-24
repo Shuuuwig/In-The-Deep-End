@@ -61,21 +61,14 @@ public class BattleHandler : StateMachine
 
         for (int i = 0; i < _teamData.UnitsInParty.Count; i++)
         {
-            Unit playerUnit = _teamData.UnitsInParty[i].GetComponent<Unit>();
-            playerUnit.InitializeUnit();
-
             if (_teamData.UnitsInParty[i] == null)
                 break;
 
-            if (playerUnit.IsDead())
-            {
-                Debug.Log($"{playerUnit.name} is dead with {playerUnit.CurrentHealthPoints} health");
-                continue;
-            }
-
             GameObject playerObject = Instantiate(_teamData.UnitsInParty[i], _playerSpawnPos[i].transform);
-
             playerObject.transform.localPosition = new Vector3(0, 0, 10);
+
+            Unit playerUnit = playerObject.GetComponent<Unit>();
+            playerUnit.InitializeUnit();
 
             playerUnit.SpawnIndex = i;
             playerUnit.IsPlayer = true;
@@ -85,14 +78,14 @@ public class BattleHandler : StateMachine
 
         for (int i = 0; i < _battleData.EnemyUnitsInBattle.Count; i++)
         {
-            Unit enemyUnit = _battleData.EnemyUnitsInBattle[i].GetComponent<Unit>();
-            enemyUnit.InitializeUnit();
-
             if (_battleData.EnemyUnitsInBattle[i] == null)
                 break;
 
             GameObject enemyObject = Instantiate(_battleData.EnemyUnitsInBattle[i], _enemySpawnPos[i].transform);
             enemyObject.transform.localPosition = new Vector3(0, 0, 10);
+
+            Unit enemyUnit = enemyObject.GetComponent<Unit>();
+            enemyUnit.InitializeUnit();
 
             enemyUnit.SpawnIndex = i;
             enemyUnit.IsPlayer = false;
