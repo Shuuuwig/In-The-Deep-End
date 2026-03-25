@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class EndOfTurnState : TurnState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void Enter()
     {
-        
-    }
+        base.Enter();
+        Debug.Log("End of Turn");
+        _combatUIHandler.ResetTargetsIndicators();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        _currentActiveUnit.ClearAction();
+        _currentActiveUnit.StatusCheck();
+        CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);
+
+        _battleHandler.ChangeState<StartOfTurnState>();
     }
 }

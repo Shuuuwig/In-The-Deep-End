@@ -25,6 +25,7 @@ public static class TurnFunctions
 
     public static Unit CurrentActiveUnit(List<Unit> activeUnits)
     {
+        Debug.Log($"Current Active Unit: {activeUnits[0]}");
         return activeUnits[0];
     }
 
@@ -39,8 +40,6 @@ public static class TurnFunctions
 
             Debug.Log($"{activeUnits[index].gameObject.name} {index} = {activeUnits[index].CurrentTurnValue} (Initial)");
         }
-
-        SortActiveUnits(activeUnits, playerUnitTag, enemyUnitTag, playerGraveyard, enemyGraveyard);
     }
 
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
@@ -66,13 +65,13 @@ public static class TurnFunctions
             return;
         }
 
-        float turnValuePassed = activeUnits[0].CurrentTurnValue;
+        float turnValuePassed = activeUnits[1].CurrentTurnValue;
 
         for (int index = 0; index < activeUnits.Count; index++)
         {
             if (index == 0)
             {
-                activeUnits[index].CurrentTurnValue = activeUnits[index].BaseTurnValue;
+                activeUnits[index].CurrentTurnValue = activeUnits[index].BaseTurnValue - turnValuePassed;
             }
             else
             {
@@ -86,8 +85,6 @@ public static class TurnFunctions
 
             Debug.Log($"{activeUnits[index].gameObject.name} {index} = {activeUnits[index].CurrentTurnValue}");
         }
-
-        SortActiveUnits(activeUnits, playerUnitTag, enemyUnitTag, playerGraveyard, enemyGraveyard);
     }
 
     public static TurnType DetermineTurn(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag)

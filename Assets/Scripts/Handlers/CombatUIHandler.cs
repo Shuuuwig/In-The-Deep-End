@@ -17,6 +17,8 @@ public class CombatUIHandler : MonoBehaviour
     [SerializeField] private List<Slider> _playerHealthbars;
     [SerializeField] private List<Slider> _enemyHealthbars;
     [SerializeField] private List<GameObject> _turnValueDisplay;
+    [SerializeField] private List<Image> _turnValuePortrait = new List<Image>();
+    [SerializeField] private List<TMP_Text> _turnValueText = new List<TMP_Text>();
 
     [Header("Move Selection")]
     [SerializeField] private List<GameObject> _movesetSelections;
@@ -29,8 +31,6 @@ public class CombatUIHandler : MonoBehaviour
     private GameObject _currentTargetedPosition;
     private SpriteRenderer _currentTargetIndicator;
 
-    private List<Image> _turnValuePortrait = new List<Image>();
-    private List<TMP_Text> _turnValueText = new List<TMP_Text>();
     private List<Button> _movesetButtons = new List<Button>();
     private List<TMP_Text> _movesetButtonText = new List<TMP_Text>();
     private List<SpriteRenderer> _markedTargetIndicators = new List<SpriteRenderer>();
@@ -111,12 +111,12 @@ public class CombatUIHandler : MonoBehaviour
     public void ShowHealthbars()
     {
         foreach (Unit unit in _battleHandler.ActiveUnits)
-        {        
+        {
             if (unit.IsDead())
             {
                 Debug.Log($"THIS UNIT {unit} IS DEAD");
                 continue;
-            }                
+            }
 
             if (unit.IsPlayer)
             {
@@ -245,7 +245,8 @@ public class CombatUIHandler : MonoBehaviour
 
     protected void GetValidTarget()
     {
-        bool isAllyTargeting = CombatFunctions.IsAllyTargeting(_currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].ActionCategory);
+        bool isAllyTargeting = CombatFunctions.IsAllyTargeting(_currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].ActionCategory,
+        _currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].StatusCategory);
 
         if (isAllyTargeting == false)
         {
@@ -336,6 +337,7 @@ public class CombatUIHandler : MonoBehaviour
         {
             if (i < _battleHandler.ActiveUnits.Count)
             {
+                Debug.Log("Updating Turn Display");
                 Unit unit = _battleHandler.ActiveUnits[i];
                 _turnValueText[i].text = $"{unit.name} TV: {unit.CurrentTurnValue}";
             }

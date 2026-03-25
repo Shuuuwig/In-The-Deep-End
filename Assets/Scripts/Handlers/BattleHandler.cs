@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class BattleHandler : StateMachine
 {
-    [Header("Battle Setup Data")]
-    [SerializeField] protected RoomData _roomData;
+    [Header("Room Data")]
+    [SerializeField] protected RoomData _currentRoomData;
+    [SerializeField] protected RoomData _mapRoomData;
     protected TeamData _teamData;
     [SerializeField] protected List<BattleData> Tier1Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> Tier2Battle = new List<BattleData>();
@@ -29,6 +30,11 @@ public class BattleHandler : StateMachine
     protected string _playerUnitTag = "PlayerUnit";
     protected string _enemyUnitTag = "EnemyUnit";
 
+    public RoomData MapRoomData => _mapRoomData;
+    public string PlayerUnitTag => _playerUnitTag;
+    public string EnemyUnitTag => _enemyUnitTag;
+    public GameObject PlayerGraveyard => _playerGraveyard;
+    public GameObject EnemyGraveyard => _enemyGraveyard;
     public List<Unit> TargetedUnits => _targetedUnits;
     public List<GameObject> PlayerSpawnPos => _playerSpawnPos;
     public List<GameObject> EnemySpawnPos => _enemySpawnPos;
@@ -98,13 +104,14 @@ public class BattleHandler : StateMachine
         _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
         _currentActiveUnit = TurnFunctions.CurrentActiveUnit(_activeUnits);
         TurnFunctions.InitialTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
+        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
 
         _combatUIHandler.InitializeHealthDisplay();
 
-        ChangeState<StartOfTurnState>();
+        ChangeState<InitialTurnState>();
     }
 
-    public void NextUnitTurn()
+    protected void UnitTurn()
     {
         TurnType turnType = TurnFunctions.DetermineTurn(_activeUnits, _playerUnitTag, _enemyUnitTag);
         _currentActiveUnit = TurnFunctions.CurrentActiveUnit(_activeUnits);
@@ -112,15 +119,29 @@ public class BattleHandler : StateMachine
 
         if (turnType == TurnType.PlayerTurn)
         {
-            Debug.Log("Player turn");
+            Debug.Log($"Player turn: {_currentActiveUnit}");
             ChangeState<PlayerPlanState>();
         }
         else if (turnType == TurnType.EnemyTurn)
         {
-            Debug.Log("Enemu turn");
+            Debug.Log($"Enemy turn: {_currentActiveUnit}");
             ChangeState<EnemyPlanState>();
         }
         else
             Debug.Log("Noones turn");
+    }
+
+    public void InitialUnitTurn()
+    {
+        UnitTurn();
+    }
+
+    public void NextUnitTurn()
+    {
+
+        TurnFunctions.UpdateTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag,
+                _playerGraveyard, _enemyGraveyard, _mapRoomData);
+        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
+        UnitTurn();
     }
 }

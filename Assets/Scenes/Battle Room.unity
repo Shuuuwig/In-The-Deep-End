@@ -2603,12 +2603,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1055478720}
-  - {fileID: 719049074}
-  - {fileID: 1566997160}
-  - {fileID: 1938231143}
-  - {fileID: 789334567}
   - {fileID: 310593153}
+  - {fileID: 789334567}
+  - {fileID: 1938231143}
+  - {fileID: 1566997160}
+  - {fileID: 719049074}
+  - {fileID: 1055478720}
   m_Father: {fileID: 713302139}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4643,6 +4643,20 @@ MonoBehaviour:
   - {fileID: 280483061}
   _turnValueDisplay:
   - {fileID: 749490219}
+  _turnValuePortrait:
+  - {fileID: 1055478721}
+  - {fileID: 719049075}
+  - {fileID: 1566997161}
+  - {fileID: 1938231144}
+  - {fileID: 789334568}
+  - {fileID: 310593154}
+  _turnValueText:
+  - {fileID: 149994026}
+  - {fileID: 1634471431}
+  - {fileID: 276193271}
+  - {fileID: 2067329481}
+  - {fileID: 2117317681}
+  - {fileID: 1695952608}
   _movesetSelections:
   - {fileID: 27012157}
   - {fileID: 105439990}

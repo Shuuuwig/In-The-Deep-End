@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class StartOfTurnState : TurnState
+public class InitialTurnState : TurnState
 {
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Start of Turn");
-        
-        _battleHandler.NextUnitTurn();
+        Debug.Log("Initial Turn");
+
         _combatUIHandler.UpdateTurnDisplay();
+        _battleHandler.InitialUnitTurn();
     }
 }

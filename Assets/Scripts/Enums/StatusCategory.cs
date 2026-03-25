@@ -2,5 +2,6 @@ public enum StatusCategory
 {
     None,
     Buff,
-    Debuff
+    Debuff,
+    DOT
 }

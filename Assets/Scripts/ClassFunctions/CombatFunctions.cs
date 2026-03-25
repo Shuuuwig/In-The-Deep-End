@@ -15,11 +15,45 @@ public static class CombatFunctions
         return false;
     }
 
+    public static bool IsAllyTargeting(ActionCategory actionCategory, StatusCategory statusCategory)
+    {
+        switch (actionCategory)
+        {
+            case ActionCategory.Heal:
+                return true;
+            case ActionCategory.StatusEffect:
+                return IsPositiveStatus(statusCategory);
+        }
+        return false;
+    }
+
     public static bool IsEnemyTargeting(ActionCategory actionCategory)
     {
         switch (actionCategory)
         {
             case ActionCategory.Attack:
+                return true;
+        }
+        return false;
+    }
+
+    public static bool IsEnemyTargeting(ActionCategory actionCategory, StatusCategory statusCategory)
+    {
+        switch (actionCategory)
+        {
+            case ActionCategory.Attack:
+                return true;
+            case ActionCategory.StatusEffect:
+                return IsPositiveStatus(statusCategory);
+        }
+        return false;
+    }
+
+    public static bool IsPositiveStatus(StatusCategory statusCategory)
+    {
+        switch (statusCategory)
+        {
+            case StatusCategory.Buff:
                 return true;
         }
         return false;

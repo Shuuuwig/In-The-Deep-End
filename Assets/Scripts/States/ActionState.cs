@@ -39,6 +39,6 @@ public class ActionState : TurnState
             //yield return StartCoroutine(CombatFunctions.InflictStatusEffect(_battleHandler.TargetedUnits, actionDataUsed.));
         }
 
-        _battleHandler.ChangeState<TurnEndState>();
+        _battleHandler.ChangeState<EndOfTurnState>();
     }
 }
