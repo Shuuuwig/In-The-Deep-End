@@ -23,7 +23,6 @@ public class PlayerPlanState : PlanState
 
     protected void OnNavigateMoveset(object sender, InfoEventArgs<int> e)
     {
-
         if (e.info < 0)
         {
             _combatUIHandler.CheckCurrentTarget(-1);
@@ -40,7 +39,7 @@ public class PlayerPlanState : PlanState
         {
             _currentActiveUnit.CurrentActionCount = 0;
 
-            _currentActiveUnit.CheckActionCount();
+            _currentActiveUnit.ResetActionCount();
             _currentActiveUnit.ClearAction();
 
             _combatUIHandler.HideCurrentIndicator();
@@ -69,6 +68,7 @@ public class PlayerPlanState : PlanState
 
             _combatUIHandler.HideCurrentIndicator();
             _combatUIHandler.HideSelections();
+            _currentActiveUnit.CheckActionCount();
 
             _battleHandler.ChangeState<PlayerActionState>();
         }

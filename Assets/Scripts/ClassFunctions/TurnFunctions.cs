@@ -4,22 +4,8 @@ using System.Linq;
 
 public static class TurnFunctions
 {
-    public static List<Unit> SortActiveUnits(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
-                                             GameObject playerGraveyard, GameObject enemyGraveyard)
+    public static List<Unit> SortActiveUnits(List<Unit> activeUnits)
     {
-        for (int index = 0; index < activeUnits.Count; index++)
-        {
-            if (activeUnits[index].IsDead())
-            {
-                if (activeUnits[index].CompareTag(enemyUnitTag))
-                    activeUnits[index].transform.SetParent(enemyGraveyard.transform);
-
-                if (activeUnits[index].CompareTag(playerUnitTag))
-                    activeUnits[index].transform.SetParent(playerGraveyard.transform);
-
-                activeUnits.Remove(activeUnits[index]);
-            }
-        }
         return activeUnits = activeUnits.OrderBy(unit => unit.CurrentTurnValue).ToList();
     }
 
@@ -45,7 +31,7 @@ public static class TurnFunctions
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
                                     GameObject playerGraveyard, GameObject enemyGraveyard, RoomData mapRoom)
     {
-        SortActiveUnits(activeUnits, playerUnitTag, enemyUnitTag, playerGraveyard, enemyGraveyard);
+        activeUnits = SortActiveUnits(activeUnits);
 
         bool playerAlive = false;
         bool enemyAlive = false;

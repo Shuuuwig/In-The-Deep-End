@@ -1,17 +1,13 @@
 using System;
 using System.Collections;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine;
 
-public class ActionState : TurnState
+public abstract class ActionState : TurnState
 {
     public override void Enter()
     {
         base.Enter();
-         StartCoroutine(HandleActions());
+        StartCoroutine(HandleActions());
     }
-
     protected override void AddListeners()
     {
         base.AddListeners();
@@ -22,23 +18,10 @@ public class ActionState : TurnState
         base.RemoveListeners();
     }
 
-    protected virtual IEnumerator HandleActions()
+    protected virtual void CounterConfirmed(object sender, InfoEventArgs<bool> e)
     {
-        // 1. Get the data for the action being used
-        ActionData actionDataUsed = _currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed];
-
-        if (CombatFunctions.IsEnemyTargeting(actionDataUsed.ActionCategory))
-        {
-            Debug.Log($"Executing Damage Action: {actionDataUsed.ActionName}");
-
-            yield return StartCoroutine(CombatFunctions.Damage(_currentActiveUnit, _battleHandler.TargetedUnits));
-        }
-        else
-        {
-            // Handle Buffs/Heals
-            //yield return StartCoroutine(CombatFunctions.InflictStatusEffect(_battleHandler.TargetedUnits, actionDataUsed.));
-        }
-
-        _battleHandler.ChangeState<EndOfTurnState>();
+        RemoveListeners();
     }
+
+    protected abstract IEnumerator HandleActions();
 }

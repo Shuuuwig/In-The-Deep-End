@@ -10,6 +10,7 @@ public class InputHandler : MonoBehaviour
     InputAction _confirmAction;
     InputAction _earlyEndAction;
     InputAction _cancelAction;
+    InputAction _counterAction;
     protected float _horizontalValue;
     protected float _verticalValue;
 
@@ -17,6 +18,7 @@ public class InputHandler : MonoBehaviour
     public static event EventHandler<InfoEventArgs<bool>> ConfirmActionEvent;
     public static event EventHandler<InfoEventArgs<bool>> EarlyEndActionEvent;
     public static event EventHandler<InfoEventArgs<bool>> CancelActionEvent;
+    public static event EventHandler<InfoEventArgs<bool>> CounterActionEvent;
 
     void Awake()
     {
@@ -24,6 +26,7 @@ public class InputHandler : MonoBehaviour
         _confirmAction = inputActionsUnity.FindAction("UI/Submit");
         _earlyEndAction = inputActionsUnity.FindAction("UI/EarlyEnd");
         _cancelAction = inputActionsUnity.FindAction("UI/Cancel");
+        _counterAction = inputActionsUnity.FindAction("UI/Counter");
     }
 
     void OnEnable()
@@ -67,6 +70,11 @@ public class InputHandler : MonoBehaviour
         if (_cancelAction.WasPressedThisFrame())
         {
             CancelActionEvent?.Invoke(this, new InfoEventArgs<bool>(true));
+        }
+
+        if (_counterAction.WasPressedThisFrame())
+        {
+            CounterActionEvent?.Invoke(this, new InfoEventArgs<bool>(true));
         }
     }
 }

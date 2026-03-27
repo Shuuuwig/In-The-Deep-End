@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BattleHandler : StateMachine
@@ -22,6 +23,7 @@ public class BattleHandler : StateMachine
     [Header("Battle State")]
     protected Unit _currentActiveUnit;
     protected List<Unit> _activeUnits = new List<Unit>();
+    protected HashSet<GameObject> _unactiveUnitObjects = new HashSet<GameObject>();
     protected List<Unit> _targetedUnits = new List<Unit>();
     protected TurnType _turnType;
 
@@ -101,10 +103,10 @@ public class BattleHandler : StateMachine
 
         Debug.Log($"Number of active units: {_activeUnits.Count}");
 
-        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
+        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
         _currentActiveUnit = TurnFunctions.CurrentActiveUnit(_activeUnits);
         TurnFunctions.InitialTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
-        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
+        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
 
         _combatUIHandler.InitializeHealthDisplay();
 
@@ -141,7 +143,44 @@ public class BattleHandler : StateMachine
 
         TurnFunctions.UpdateTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag,
                 _playerGraveyard, _enemyGraveyard, _mapRoomData);
-        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits, _playerUnitTag, _enemyUnitTag, _playerGraveyard, _enemyGraveyard);
+        _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
         UnitTurn();
+    }
+
+    public void CheckForDead()
+    {
+        for (int index = 0; index < _activeUnits.Count; index++)
+        {
+            if (_activeUnits[index].IsDead())
+            {
+                if (_activeUnits[index].CompareTag(_enemyUnitTag))
+                    _activeUnits[index].transform.SetParent(_enemyGraveyard.transform);
+
+                if (_activeUnits[index].CompareTag(_playerUnitTag))
+                    _activeUnits[index].transform.SetParent(_playerGraveyard.transform);
+
+                _activeUnits.Remove(_activeUnits[index]);
+            }
+        }
+    }
+
+    public void Checkgraveyard()
+    {
+        Debug.Log("Checking Graveyard");
+        foreach (Transform child in _playerGraveyard.transform)
+        {
+            _unactiveUnitObjects.Add(child.gameObject);
+        }
+
+        foreach (Transform child in _enemyGraveyard.transform)
+        {
+            _unactiveUnitObjects.Add(child.gameObject);
+        }
+
+        foreach (GameObject unitObjects in _unactiveUnitObjects)
+        {
+            Debug.Log($"HIDING {unitObjects}");
+            unitObjects.SetActive(false);
+        }
     }
 }

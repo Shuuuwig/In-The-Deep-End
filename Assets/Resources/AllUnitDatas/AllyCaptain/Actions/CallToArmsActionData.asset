@@ -15,7 +15,7 @@ MonoBehaviour:
   ActionName: Call To Arms
   ActionCategory: 2
   TargetType: 4
-  MaxActionCount: 0
+  MaxActionCount: 1
   StatusCategory: 1
   PowerMultiplier: 0
-  Accuracy: 0
+  Accuracy: 100

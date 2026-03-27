@@ -7,6 +7,7 @@ public class PlayerGunslingerUnit : Unit
 {
     protected int _maxAmmo;
     protected int _currentAmmo;
+    protected int _savedAmmo;
 
     [Header("Gunslinger UI")]
     protected Canvas _canvas;
@@ -38,7 +39,7 @@ public class PlayerGunslingerUnit : Unit
             _moveset.Add(Multishot, _actionDatas[1]);
         }
 
-
+        _savedAmmo = _currentAmmo;
     }
 
     protected override void UnitUniqueUI()
@@ -60,6 +61,7 @@ public class PlayerGunslingerUnit : Unit
         rect.sizeDelta = new Vector2(200, 50);
 
         _ammoNumber.fontSize = 24f;
+        _ammoNumber.color = Color.black;
         _ammoNumber.alignment = TextAlignmentOptions.BottomLeft;
 
         UpdateAmmoText();
@@ -80,9 +82,21 @@ public class PlayerGunslingerUnit : Unit
         MovesetHandler();
     }
 
+    public override void ResetActionCount()
+    {
+        _currentAmmo = _savedAmmo;
+    }
+
     public override bool CanCounter()
     {
         return _currentAmmo >= 2;
+    }
+
+    public override void Countered(object sender, InfoEventArgs<bool> e)
+    {
+        Debug.Log("Countered");
+        _currentAmmo -= 2;
+        UpdateAmmoText();
     }
 
     protected void AmmoCheck()
@@ -94,7 +108,7 @@ public class PlayerGunslingerUnit : Unit
         }
         else if (ActionUsed == Multishot)
         {
-            _currentAmmo -= CurrentActionCount;
+            _currentAmmo--;
         }
 
         UpdateAmmoText();
@@ -113,7 +127,7 @@ public class PlayerGunslingerUnit : Unit
         ActionUsed = Reload;
 
         CurrentDamage = 0;
-        _maxActionCount = _actionDatas[1].MaxActionCount;
+        _maxActionCount = _actionDatas[0].MaxActionCount;
         _currentAmmo = _maxAmmo;
 
         //DamageSound = _audioClips[1];
@@ -133,7 +147,7 @@ public class PlayerGunslingerUnit : Unit
             _maxActionCount = _actionDatas[1].MaxActionCount;
         }
 
-        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+        CurrentDamage = BaseDamage * _actionDatas[1].PowerMultiplier;
         //DamageSound = _audioClips[0];
         //AttackAnimation = _animationClips[1];
     }

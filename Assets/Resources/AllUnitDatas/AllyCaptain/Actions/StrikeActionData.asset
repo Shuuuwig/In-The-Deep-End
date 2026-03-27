@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86d0a25b3301f5a46a7db3dcb0906a22, type: 3}
   m_Name: StrikeActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
-  ActionName: Slash
+  ActionName: Strike
   ActionCategory: 0
   TargetType: 1
-  MaxActionCount: 0
+  MaxActionCount: 1
   StatusCategory: 0
-  PowerMultiplier: 0
-  Accuracy: 0
+  PowerMultiplier: 1.5
+  Accuracy: 100

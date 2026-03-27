@@ -12,18 +12,18 @@ public class AllyCaptain : Unit
     protected override void MovesetHandler()
     {
         _moveset.Clear();
+        _moveset.Add(Strike, _actionDatas[0]);
 
-        
     }
 
     protected override void UnitUniqueUI()
     {
-        
+
     }
 
     public override void CheckActionCount()
     {
-        
+
     }
 
     public override void ClearAction()
@@ -36,9 +36,32 @@ public class AllyCaptain : Unit
         MovesetHandler();
     }
 
+    public override void ResetActionCount()
+    {
+        
+    }
+
     public override bool CanCounter()
     {
         return false;
     }
 
+    public override void Countered(object sender, InfoEventArgs<bool> e)
+    {
+        
+    }
+
+    protected void Strike()
+    {
+        ActionUsed = Strike;
+
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+    }
+
+    protected void CallToArms()
+    {
+        ActionUsed = CallToArms;
+
+        CurrentDamage = 0;
+    }
 }

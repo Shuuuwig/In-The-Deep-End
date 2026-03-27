@@ -12,18 +12,18 @@ public class EnemyCrewmate : Unit
     protected override void MovesetHandler()
     {
         _moveset.Clear();
+        _moveset.Add(Slash, _actionDatas[0]);
 
-        
     }
 
     protected override void UnitUniqueUI()
     {
-        
+
     }
 
     public override void CheckActionCount()
     {
-        
+
     }
 
     public override void ClearAction()
@@ -36,8 +36,26 @@ public class EnemyCrewmate : Unit
         MovesetHandler();
     }
 
+    public override void ResetActionCount()
+    {
+        
+    }
+
     public override bool CanCounter()
     {
         return false;
+    }
+
+    public override void Countered(object sender, InfoEventArgs<bool> e)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected void Slash()
+    {
+        ActionUsed = Slash;
+        _maxActionCount = _actionDatas[0].MaxActionCount;
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+
     }
 }

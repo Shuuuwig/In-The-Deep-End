@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
-using Random=UnityEngine.Random;
+using Random = UnityEngine.Random;
 
 public class EnemyPlanState : PlanState
 {
@@ -28,7 +28,23 @@ public class EnemyPlanState : PlanState
     IEnumerator TempTimer() // ALL TEMPORARY
     {
         yield return new WaitForSeconds(1f);
+        _currentActiveUnit.Moveset.Keys.ElementAt(0).Invoke();
+        int randomNumber = Random.Range(0, 2);
 
-        _battleHandler.ChangeState<ActionState>();
+        Unit targetedUnit = _battleHandler.PlayerSpawnPos[randomNumber].transform.GetComponentInChildren<Unit>();
+
+        if (_battleHandler.PlayerSpawnPos[randomNumber].transform.GetComponentInChildren<Unit>() == null)
+        {
+            if (randomNumber == 0)
+                targetedUnit = _battleHandler.PlayerSpawnPos[1].transform.GetComponentInChildren<Unit>();
+            else
+                targetedUnit = _battleHandler.PlayerSpawnPos[0].transform.GetComponentInChildren<Unit>();
+        }
+
+        _battleHandler.TargetedUnits.Add(targetedUnit);
+
+        Debug.Log("Enemy Logic Ended");
+
+        _battleHandler.ChangeState<EnemyActionState>();
     }
 }

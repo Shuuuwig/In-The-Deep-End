@@ -12,6 +12,7 @@ public class CombatUIHandler : MonoBehaviour
 
     [Header("UI Panels & Prefabs")]
     [SerializeField] private GameObject _actionPanel;
+    [SerializeField] private GameObject _counterPrompt;
 
     [Header("Health & Turn Displays")]
     [SerializeField] private List<Slider> _playerHealthbars;
@@ -346,5 +347,15 @@ public class CombatUIHandler : MonoBehaviour
                 _turnValueText[i].text = string.Empty;
             }
         }
+    }
+
+    public void ShowCounterPrompt()
+    {
+        _counterPrompt.SetActive(true);
+    }
+
+    public void HideCounterPrompt(object sender, InfoEventArgs<bool> e)
+    {
+        _counterPrompt.SetActive(false);
     }
 }

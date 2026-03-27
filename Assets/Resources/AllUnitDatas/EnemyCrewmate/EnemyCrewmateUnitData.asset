@@ -18,7 +18,9 @@ MonoBehaviour:
   BaseDamage: 8
   CharacterSprite: {fileID: -147883733820336173, guid: 6b68e435b9654014899ac0ec6c66c8f5, type: 3}
   CharacterIcons: []
-  MarkedTargetIndicators: []
+  MarkedTargetIndicators:
+  - {fileID: 4176362632249098406, guid: cc9cc1545cb776248b4f879ca3f30187, type: 3}
   AudioClips: []
   AnimationClips: []
-  ActionDatas: []
+  ActionDatas:
+  - {fileID: 11400000, guid: 293c6f7b5d702ac42947662ea1c8bb7e, type: 2}

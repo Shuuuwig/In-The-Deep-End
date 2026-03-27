@@ -100,10 +100,10 @@ public abstract class Unit : MonoBehaviour
         CurrentHealthPoints = MaxHealthPoints;
     }
 
-
-
     protected abstract void MovesetHandler();
     protected abstract void UnitUniqueUI();
     public abstract void StatusCheck();
+    public abstract void ResetActionCount();
     public abstract bool CanCounter();
+    public abstract void Countered(object sender, InfoEventArgs<bool> e);
 }

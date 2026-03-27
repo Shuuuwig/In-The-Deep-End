@@ -16,6 +16,6 @@ MonoBehaviour:
   ActionCategory: 2
   TargetType: 0
   MaxActionCount: 1
-  StatusCategory: 0
+  StatusCategory: 1
   PowerMultiplier: 0
   Accuracy: 100

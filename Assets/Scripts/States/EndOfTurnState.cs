@@ -6,6 +6,8 @@ public class EndOfTurnState : TurnState
     {
         base.Enter();
         Debug.Log("End of Turn");
+        _battleHandler.CheckForDead();
+        _battleHandler.Checkgraveyard();
         _combatUIHandler.ResetTargetsIndicators();
 
         _currentActiveUnit.ClearAction();
