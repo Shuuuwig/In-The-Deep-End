@@ -19,12 +19,18 @@ public class RoomInfo : MonoBehaviour
 
         _roomButton.onClick.RemoveAllListeners();
 
-        _roomButton.onClick.AddListener(() => RoomHandler.GoToRoom(_roomData));
-        mapData.CurrentRow++;
+        _roomButton.onClick.AddListener(() =>
+        {
+            mapData.CurrentRow++;
 
+            if (mapHandler != null)
+            {
+                mapHandler.EnterRoom(this);
+            }
 
-        if (mapHandler != null)
-            _roomButton.onClick.AddListener(() => mapHandler.EnterRoom(this));
+            Debug.Log("To a room");
+            RoomHandler.GoToRoom(_roomData);
+        });
 
         TMP_Text displayName = GetComponentInChildren<TMP_Text>();
         if (displayName != null)

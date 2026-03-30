@@ -112,7 +112,7 @@ public static class CombatFunctions
             // AudioHandler.PlaySound(targets[index].AudioSource, targets[index].TakenDamageSound);
             // AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].AttackAnimation);
 
-            yield return null;
+            yield return new WaitForSeconds(0.2f);
 
             // float animationLength = targets[index].Animator.GetCurrentAnimatorStateInfo(0).length;
 

@@ -29,7 +29,7 @@ public static class TurnFunctions
     }
 
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
-                                    GameObject playerGraveyard, GameObject enemyGraveyard, RoomData mapRoom)
+                                    GameObject playerGraveyard, GameObject enemyGraveyard, MapData mapRoom)
     {
         activeUnits = SortActiveUnits(activeUnits);
 

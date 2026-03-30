@@ -61,7 +61,7 @@ public class PlayerGunslingerUnit : Unit
         rect.sizeDelta = new Vector2(200, 50);
 
         _ammoNumber.fontSize = 24f;
-        _ammoNumber.color = Color.black;
+        _ammoNumber.color = Color.white;
         _ammoNumber.alignment = TextAlignmentOptions.BottomLeft;
 
         UpdateAmmoText();

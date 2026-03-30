@@ -68,8 +68,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -7166361886933412257, guid: bea75b97ac5bece4bb7ea84ea9d1baa9, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b343720725da2a348a75c65fd5c857d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomInfo
+  _roomButton: {fileID: 0}
   NextConnectedRooms: []
 --- !u!1 &4562547269658265129
 GameObject:

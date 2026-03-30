@@ -6,7 +6,7 @@ public class BattleHandler : StateMachine
 {
     [Header("Room Data")]
     [SerializeField] protected RoomData _currentRoomData;
-    [SerializeField] protected RoomData _mapRoomData;
+    [SerializeField] protected MapData _mapRoomData;
     protected TeamData _teamData;
     [SerializeField] protected List<BattleData> Tier1Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> Tier2Battle = new List<BattleData>();
@@ -32,7 +32,7 @@ public class BattleHandler : StateMachine
     protected string _playerUnitTag = "PlayerUnit";
     protected string _enemyUnitTag = "EnemyUnit";
 
-    public RoomData MapRoomData => _mapRoomData;
+    public MapData MapRoomData => _mapRoomData;
     public string PlayerUnitTag => _playerUnitTag;
     public string EnemyUnitTag => _enemyUnitTag;
     public GameObject PlayerGraveyard => _playerGraveyard;
@@ -149,17 +149,21 @@ public class BattleHandler : StateMachine
 
     public void CheckForDead()
     {
-        for (int index = 0; index < _activeUnits.Count; index++)
+        for (int index = _activeUnits.Count - 1; index >= 0; index--)
         {
             if (_activeUnits[index].IsDead())
             {
-                if (_activeUnits[index].CompareTag(_enemyUnitTag))
-                    _activeUnits[index].transform.SetParent(_enemyGraveyard.transform);
+                Unit deadUnit = _activeUnits[index];
 
-                if (_activeUnits[index].CompareTag(_playerUnitTag))
-                    _activeUnits[index].transform.SetParent(_playerGraveyard.transform);
+                if (deadUnit.IsPlayer)
+                    deadUnit.transform.SetParent(_playerGraveyard.transform);
+                else
+                {
+                    deadUnit.transform.SetParent(_enemyGraveyard.transform);
+                    Debug.Log($"ADDED {deadUnit.name} to graveyard");
+                }
 
-                _activeUnits.Remove(_activeUnits[index]);
+                _activeUnits.RemoveAt(index);
             }
         }
     }

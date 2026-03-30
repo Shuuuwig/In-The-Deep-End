@@ -29,6 +29,7 @@ public class EnemyActionState : ActionState
             _combatUIHandler.ShowCounterPrompt();
             AddListeners();
             yield return new WaitForSeconds(1f);
+            _combatUIHandler.HideCounterPrompt();
             RemoveListeners();
         }
         else if (CombatFunctions.IsEnemyTargeting(actionDataUsed.ActionCategory))

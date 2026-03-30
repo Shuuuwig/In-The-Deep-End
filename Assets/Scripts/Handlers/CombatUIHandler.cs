@@ -15,6 +15,7 @@ public class CombatUIHandler : MonoBehaviour
     [SerializeField] private GameObject _counterPrompt;
 
     [Header("Health & Turn Displays")]
+    [SerializeField] private List<TMP_Text> _unitNames;
     [SerializeField] private List<Slider> _playerHealthbars;
     [SerializeField] private List<Slider> _enemyHealthbars;
     [SerializeField] private List<GameObject> _turnValueDisplay;
@@ -111,22 +112,38 @@ public class CombatUIHandler : MonoBehaviour
 
     public void ShowHealthbars()
     {
-        foreach (Unit unit in _battleHandler.ActiveUnits)
+        for (int i = 0; i < _battleHandler.ActiveUnits.Count; i++)
         {
+            Unit unit = _battleHandler.ActiveUnits[i];
+
             if (unit.IsDead())
             {
-                Debug.Log($"THIS UNIT {unit} IS DEAD");
+                Debug.Log($"THIS UNIT {unit.name} IS DEAD");
                 continue;
             }
 
+            int uiIndex = unit.SpawnIndex;
+
             if (unit.IsPlayer)
             {
-                _playerHealthbars[unit.SpawnIndex].gameObject.SetActive(true);
+                _playerHealthbars[uiIndex].gameObject.SetActive(true);
+                _unitNames[uiIndex].text = unit.name;
             }
             else
             {
-                _enemyHealthbars[unit.SpawnIndex].gameObject.SetActive(true);
+                _enemyHealthbars[uiIndex].gameObject.SetActive(true);
             }
+
+            Slider targetSlider = _playerHealthbars[unit.SpawnIndex];
+
+            if (targetSlider == null)
+            {
+                Debug.LogError($"Slider at index {unit.SpawnIndex} is NULL on {gameObject.name}. " +
+                               "Check if the reference was lost during scene load!");
+                continue;
+            }
+
+            targetSlider.gameObject.SetActive(true);
         }
     }
 
@@ -352,6 +369,11 @@ public class CombatUIHandler : MonoBehaviour
     public void ShowCounterPrompt()
     {
         _counterPrompt.SetActive(true);
+    }
+
+    public void HideCounterPrompt()
+    {
+        _counterPrompt.SetActive(false);
     }
 
     public void HideCounterPrompt(object sender, InfoEventArgs<bool> e)

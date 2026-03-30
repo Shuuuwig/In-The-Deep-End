@@ -23,6 +23,9 @@ public class PlayerPlanState : PlanState
 
     protected void OnNavigateMoveset(object sender, InfoEventArgs<int> e)
     {
+        if (_currentActiveUnit.ActionUsed == null)
+            return;
+
         if (e.info < 0)
         {
             _combatUIHandler.CheckCurrentTarget(-1);
@@ -81,6 +84,9 @@ public class PlayerPlanState : PlanState
 
     protected void OnEarlyEnd(object sender, InfoEventArgs<bool> e)
     {
+        if (_currentActiveUnit.ActionUsed == null)
+            return;
+
         if (_currentActiveUnit.CurrentActionCount < 1)
             return;
 

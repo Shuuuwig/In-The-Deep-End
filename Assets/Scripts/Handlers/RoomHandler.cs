@@ -10,4 +10,11 @@ public class RoomHandler : MonoBehaviour
         SceneManager.LoadScene(roomData.RoomName);
         Debug.Log("ROOM");
     }
+
+    public static void GoToRoom (MapData mapData)
+    {
+        SceneManager.LoadScene(2);
+        Debug.Log("ROOM");
+    }
 }
+

@@ -160,7 +160,6 @@ public class MapHandler : MonoBehaviour
 
     public void ManageInitialSelections()
     {
-        // Use MapPrefs.Row and MapPrefs.RoomID
         int savedRow = PlayerPrefs.GetInt(MapPrefs.Row, -1);
         int savedRoomID = PlayerPrefs.GetInt(MapPrefs.RoomID, -1);
 
@@ -178,8 +177,11 @@ public class MapHandler : MonoBehaviour
                 {
                     if (row == savedRow && room.transform.GetSiblingIndex() == savedRoomID)
                     {
+                        Debug.Log($"Found Saved Room: {room.name}. Connections count: {room.NextConnectedRooms.Count}");
+
                         foreach (RoomInfo nextRoom in room.NextConnectedRooms)
                         {
+                            Debug.Log($"next room is {nextRoom}");
                             nextRoom.SetInteractable(true);
                         }
                     }
@@ -196,19 +198,16 @@ public class MapHandler : MonoBehaviour
     {
         int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
 
-        // Logic check: if it's the last row, wipe progress
         if (roomRowIndex == _rows.Count - 1)
         {
             ResetMapProgress();
-            return; // Don't save boss room as the "current" room for next run
+            return;
         }
 
-        // Save current progress using MapPrefs keys
         PlayerPrefs.SetInt(MapPrefs.Row, roomRowIndex);
         PlayerPrefs.SetInt(MapPrefs.RoomID, selectedRoom.transform.GetSiblingIndex());
         PlayerPrefs.Save();
 
-        // Disable all rooms
         foreach (RectTransform row in _rows)
         {
             RoomInfo[] rooms = row.GetComponentsInChildren<RoomInfo>();
@@ -218,9 +217,9 @@ public class MapHandler : MonoBehaviour
             }
         }
 
-        // Enable only the connected next rooms
         foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
         {
+            Debug.Log("New rooms selection");
             nextRoom.SetInteractable(true);
         }
     }
@@ -228,9 +227,8 @@ public class MapHandler : MonoBehaviour
     public void ResetMapProgress()
     {
         _masterSeed = 0;
-        if(_mapData != null) _mapData.CurrentRow = 0;
+        if (_mapData != null) _mapData.CurrentRow = 0;
 
-        // Wipe all keys from MapPrefs
         PlayerPrefs.DeleteKey(MapPrefs.Seed);
         PlayerPrefs.DeleteKey(MapPrefs.Row);
         PlayerPrefs.DeleteKey(MapPrefs.RoomID);
@@ -270,11 +268,26 @@ public class MapHandler : MonoBehaviour
 
     int NumberOfRoomsInRow(int currentRow)
     {
-        if (currentRow == 0) return Random.Range(2, 4);
-        if (currentRow == _rows.Count - 1) return 1;
+        if (currentRow == 0)
+        {
+            return Random.Range(2, 4);
+        }
+
+        if (currentRow == _rows.Count - 1)
+        {
+            return 1;
+        }
 
         float noise = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
-        return noise > 0.5f ? Random.Range(2, 4) : Random.Range(1, 3);
+
+        if (noise > 0.5f)
+        {
+            return Random.Range(2, 4);
+        }
+        else
+        {
+            return Random.Range(1, 3);
+        }
     }
 
     RoomData RandomizeRoomData(int row)
@@ -290,7 +303,7 @@ public class MapHandler : MonoBehaviour
     void SpawnRoomSelection(RoomData roomData, int row)
     {
         GameObject newRoom = Instantiate(_roomSelectionPrefab, _rows[row]);
-        // Note: Added _mapData to the call based on your code snippet
+
         newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this);
     }
 
