@@ -152,8 +152,10 @@ public class MapHandler : MonoBehaviour
         }
 
         List<RoomInfo> results = new List<RoomInfo>();
-        if (closest != null) results.Add(closest);
-        if (second != null) results.Add(second);
+        if (closest != null)
+            results.Add(closest);
+        if (second != null)
+            results.Add(second);
 
         return results;
     }
@@ -162,6 +164,10 @@ public class MapHandler : MonoBehaviour
     {
         int savedRow = PlayerPrefs.GetInt(MapPrefs.Row, -1);
         int savedRoomID = PlayerPrefs.GetInt(MapPrefs.RoomID, -1);
+
+        Debug.Log($"THIS IS THE SAVED ROW!!!!{savedRow}");
+        Debug.Log($"THIS IS THE SAVED ROOMID!!!!{savedRoomID}");
+
 
         for (int row = 0; row < _rows.Count; row++)
         {
@@ -227,7 +233,8 @@ public class MapHandler : MonoBehaviour
     public void ResetMapProgress()
     {
         _masterSeed = 0;
-        if (_mapData != null) _mapData.CurrentRow = 0;
+        if (_mapData != null)
+            _mapData.CurrentRow = 0;
 
         PlayerPrefs.DeleteKey(MapPrefs.Seed);
         PlayerPrefs.DeleteKey(MapPrefs.Row);

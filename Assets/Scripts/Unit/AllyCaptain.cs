@@ -6,10 +6,11 @@ public class AllyCaptain : Unit
     {
         base.InitializeUnit();
 
+        UpdateMoveset();
         UnitUniqueUI();
     }
 
-    protected override void MovesetHandler()
+    protected override void UpdateMoveset()
     {
         _moveset.Clear();
         _moveset.Add(Strike, _actionDatas[0]);
@@ -33,12 +34,12 @@ public class AllyCaptain : Unit
 
     public override void StatusCheck()
     {
-        MovesetHandler();
+        
     }
 
     public override void ResetActionCount()
     {
-        
+
     }
 
     public override bool CanCounter()
@@ -48,7 +49,7 @@ public class AllyCaptain : Unit
 
     public override void Countered(object sender, InfoEventArgs<bool> e)
     {
-        
+
     }
 
     protected void Strike()

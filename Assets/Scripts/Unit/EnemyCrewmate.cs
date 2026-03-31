@@ -6,10 +6,11 @@ public class EnemyCrewmate : Unit
     {
         base.InitializeUnit();
 
+        UpdateMoveset();
         UnitUniqueUI();
     }
 
-    protected override void MovesetHandler()
+    protected override void UpdateMoveset()
     {
         _moveset.Clear();
         _moveset.Add(Slash, _actionDatas[0]);
@@ -33,12 +34,12 @@ public class EnemyCrewmate : Unit
 
     public override void StatusCheck()
     {
-        MovesetHandler();
+
     }
 
     public override void ResetActionCount()
     {
-        
+
     }
 
     public override bool CanCounter()

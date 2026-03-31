@@ -16,3 +16,4 @@ MonoBehaviour:
   EnemyUnitsInBattle:
   - {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}
   - {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}
+  - {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}

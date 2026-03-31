@@ -59,7 +59,7 @@ public abstract class Unit : MonoBehaviour
         if (_animationClips != null && _animationClips.Count > 0)
             DefaultIdleClip = _animationClips[0];
             
-        MovesetHandler();
+        UpdateMoveset();
     }
 
     protected virtual void Update() { }
@@ -100,7 +100,7 @@ public abstract class Unit : MonoBehaviour
         CurrentHealthPoints = MaxHealthPoints;
     }
 
-    protected abstract void MovesetHandler();
+    protected abstract void UpdateMoveset();
     protected abstract void UnitUniqueUI();
     public abstract void StatusCheck();
     public abstract void ResetActionCount();

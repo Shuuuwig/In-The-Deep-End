@@ -17,29 +17,37 @@ public class PlayerGunslingerUnit : Unit
     public override void InitializeUnit()
     {
         base.InitializeUnit();
-        _maxActionCount = _actionDatas[1].MaxActionCount;
-        Debug.Log($"MAX COUNT {_maxActionCount}");
-        _maxAmmo = _maxActionCount;
+        _maxAmmo = _actionDatas[1].MaxActionCount;
         _currentAmmo = _maxAmmo;
+        _savedAmmo = _currentAmmo;
 
         if (_canvas == null)
             _canvas = FindAnyObjectByType<Canvas>();
 
+        UpdateMoveset();
         UnitUniqueUI();
     }
 
-    protected override void MovesetHandler()
-    {
-        _moveset.Clear();
-
-        _moveset.Add(Reload, _actionDatas[0]);
-
+    protected override void UpdateMoveset()
+    {   
+        if (!_moveset.ContainsKey(Reload))
+        {
+            _moveset.Add(Reload, _actionDatas[0]);
+        }
         if (_currentAmmo > 0)
         {
-            _moveset.Add(Multishot, _actionDatas[1]);
+            if (!_moveset.ContainsKey(Multishot))
+            {
+                _moveset.Add(Multishot, _actionDatas[1]);
+            }
         }
-
-        _savedAmmo = _currentAmmo;
+        else
+        {
+            if (_moveset.ContainsKey(Multishot))
+            {
+                _moveset.Remove(Multishot);
+            }
+        }
     }
 
     protected override void UnitUniqueUI()
@@ -79,14 +87,15 @@ public class PlayerGunslingerUnit : Unit
 
     public override void StatusCheck()
     {
-        MovesetHandler();
+
     }
 
     public override void ResetActionCount()
     {
         _currentAmmo = _savedAmmo;
+        UpdateAmmoText();
+        UpdateMoveset();
     }
-
     public override bool CanCounter()
     {
         return _currentAmmo >= 2;
@@ -96,7 +105,10 @@ public class PlayerGunslingerUnit : Unit
     {
         Debug.Log("Countered");
         _currentAmmo -= 2;
+        _savedAmmo = _currentAmmo;
+
         UpdateAmmoText();
+        UpdateMoveset();
     }
 
     protected void AmmoCheck()
@@ -104,14 +116,17 @@ public class PlayerGunslingerUnit : Unit
         if (ActionUsed == Reload)
         {
             _currentAmmo = _maxAmmo;
-            CurrentActionCount = 0;
         }
         else if (ActionUsed == Multishot)
         {
             _currentAmmo--;
+            _currentAmmo = Mathf.Max(0, _currentAmmo);
         }
 
+        _savedAmmo = _currentAmmo;
+
         UpdateAmmoText();
+        //UpdateMoveset();
     }
 
     private void UpdateAmmoText()
@@ -125,32 +140,17 @@ public class PlayerGunslingerUnit : Unit
     protected void Reload()
     {
         ActionUsed = Reload;
-
         CurrentDamage = 0;
         _maxActionCount = _actionDatas[0].MaxActionCount;
-        _currentAmmo = _maxAmmo;
-
-        //DamageSound = _audioClips[1];
-        //AttackAnimation = _animationClips[1];
     }
 
     protected void Multishot()
     {
         ActionUsed = Multishot;
 
-        if (_currentAmmo < _actionDatas[1].MaxActionCount)
-        {
-            _maxActionCount = _currentAmmo;
-        }
-        else
-        {
-            _maxActionCount = _actionDatas[1].MaxActionCount;
-        }
+        int skillMax = _actionDatas[1].MaxActionCount;
+        _maxActionCount = Mathf.Min(_currentAmmo, skillMax);
 
         CurrentDamage = BaseDamage * _actionDatas[1].PowerMultiplier;
-        //DamageSound = _audioClips[0];
-        //AttackAnimation = _animationClips[1];
     }
-
-
 }
