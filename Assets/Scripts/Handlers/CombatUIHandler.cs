@@ -153,7 +153,7 @@ public class CombatUIHandler : MonoBehaviour
         ToggleHealthBarList(_enemyHealthbars);
     }
 
-    private void ToggleHealthBarList(List<Slider> bars)
+    void ToggleHealthBarList(List<Slider> bars)
     {
         foreach (var bar in bars)
         {

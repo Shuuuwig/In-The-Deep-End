@@ -39,7 +39,12 @@ public class RoomInfo : MonoBehaviour
 
     public void SetInteractable(bool state)
     {
-        if (_roomButton != null)
-            _roomButton.interactable = state;
+        if (_roomButton == null)
+        {
+            Debug.Log("MISSING ROOM BUTTON");
+            return;
+        }
+
+        _roomButton.interactable = state;
     }
 }

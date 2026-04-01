@@ -64,11 +64,6 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void Update() { }
 
-    public virtual void CheckActionCount()
-    {
-        CurrentActionCount = 0;
-    }
-
     public virtual void ClearAction()
     {
         ActionUsed = null;
@@ -102,8 +97,10 @@ public abstract class Unit : MonoBehaviour
 
     protected abstract void UpdateMoveset();
     protected abstract void UnitUniqueUI();
-    public abstract void StatusCheck();
+    public abstract void CheckActionCount();
     public abstract void ResetActionCount();
+    public abstract void PlanStateInitialResources();
+    public abstract void StatusCheck();
     public abstract bool CanCounter();
     public abstract void Countered(object sender, InfoEventArgs<bool> e);
 }

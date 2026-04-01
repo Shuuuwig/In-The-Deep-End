@@ -29,7 +29,7 @@ public class PlayerGunslingerUnit : Unit
     }
 
     protected override void UpdateMoveset()
-    {   
+    {
         if (!_moveset.ContainsKey(Reload))
         {
             _moveset.Add(Reload, _actionDatas[0]);
@@ -79,10 +79,23 @@ public class PlayerGunslingerUnit : Unit
     {
         AmmoCheck();
     }
+    public override void ResetActionCount()
+    {
+        CurrentActionCount = 0;
+        _currentAmmo = _savedAmmo;
+        UpdateAmmoText();
+        UpdateMoveset();
+    }
+
+    public override void PlanStateInitialResources()
+    {
+        _savedAmmo = _currentAmmo;
+        _maxActionCount = _savedAmmo;
+    }
 
     public override void ClearAction()
     {
-        ActionUsed = null;
+        base.ClearAction();
     }
 
     public override void StatusCheck()
@@ -90,12 +103,6 @@ public class PlayerGunslingerUnit : Unit
 
     }
 
-    public override void ResetActionCount()
-    {
-        _currentAmmo = _savedAmmo;
-        UpdateAmmoText();
-        UpdateMoveset();
-    }
     public override bool CanCounter()
     {
         return _currentAmmo >= 2;
@@ -105,7 +112,6 @@ public class PlayerGunslingerUnit : Unit
     {
         Debug.Log("Countered");
         _currentAmmo -= 2;
-        _savedAmmo = _currentAmmo;
 
         UpdateAmmoText();
         UpdateMoveset();
@@ -123,10 +129,7 @@ public class PlayerGunslingerUnit : Unit
             _currentAmmo = Mathf.Max(0, _currentAmmo);
         }
 
-        _savedAmmo = _currentAmmo;
-
         UpdateAmmoText();
-        //UpdateMoveset();
     }
 
     private void UpdateAmmoText()
@@ -153,4 +156,6 @@ public class PlayerGunslingerUnit : Unit
 
         CurrentDamage = BaseDamage * _actionDatas[1].PowerMultiplier;
     }
+
+
 }

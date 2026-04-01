@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a02cae676767594e9e2c47a4a1e4dd6, type: 3}
   m_Name: SavedMapData
   m_EditorClassIdentifier: Assembly-CSharp::MapData
-  MapSeed: 0
-  NumberOfRows: 0
+  MapSeed: 537187
+  NumberOfRows: 5
   CurrentRoom: 0
-  CurrentRow: 9
+  CurrentRow: 0

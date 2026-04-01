@@ -27,6 +27,16 @@ public class AllyCaptain : Unit
 
     }
 
+    public override void ResetActionCount()
+    {
+
+    }
+
+    public override void PlanStateInitialResources()
+    {
+
+    }
+
     public override void ClearAction()
     {
         ActionUsed = null;
@@ -34,13 +44,10 @@ public class AllyCaptain : Unit
 
     public override void StatusCheck()
     {
-        
-    }
-
-    public override void ResetActionCount()
-    {
 
     }
+
+
 
     public override bool CanCounter()
     {

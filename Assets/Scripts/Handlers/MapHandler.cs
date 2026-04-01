@@ -32,35 +32,22 @@ public class MapHandler : MonoBehaviour
 
     void Start()
     {
-        // Use MapPrefs.Seed instead of local string
-        if (PlayerPrefs.HasKey(MapPrefs.Seed))
+        if (_mapData.MapSeed != 0)
         {
-            _masterSeed = PlayerPrefs.GetInt(MapPrefs.Seed);
+            _masterSeed = _mapData.MapSeed;
         }
         else
         {
             _masterSeed = Random.Range(1, 1000000);
-            PlayerPrefs.SetInt(MapPrefs.Seed, _masterSeed);
+            _mapData.MapSeed = _masterSeed;
         }
 
-        // Use MapPrefs.LastRow
-        PlayerPrefs.SetInt(MapPrefs.LastRow, _rows.Count - 1);
+        _mapData.NumberOfRows = _rows.Count;
         StartCoroutine(GenerateMapRoutine());
-    }
-
-    void OnValidate()
-    {
-        if (_combatRoomSpawnChance + _eventRoomSpawnChance > 1f)
-        {
-            _eventRoomSpawnChance = 1f - _combatRoomSpawnChance;
-        }
     }
 
     IEnumerator GenerateMapRoutine()
     {
-        if (_masterSeed == 0)
-            _masterSeed = Random.Range(1, 1000000);
-
         Random.InitState(_masterSeed);
 
         _xOffset = Random.Range(0f, 10000f);
@@ -86,6 +73,90 @@ public class MapHandler : MonoBehaviour
         SnapToBottom();
     }
 
+    public void ManageInitialSelections()
+    {
+        int savedRow = _mapData.CurrentRow;
+        int savedRoomID = _mapData.CurrentRoom;
+
+        Debug.Log($"Checking Progress: Row {savedRow}, ID {savedRoomID}");
+
+        foreach (var rowRect in _rows)
+        {
+            foreach (var room in rowRect.GetComponentsInChildren<RoomInfo>())
+                room.SetInteractable(false);
+        }
+
+        if (savedRow == -1)
+        {
+            foreach (var room in _rows[0].GetComponentsInChildren<RoomInfo>())
+                room.SetInteractable(true);
+            return;
+        }
+
+        RoomInfo[] roomsInSavedRow = _rows[savedRow].GetComponentsInChildren<RoomInfo>();
+        bool foundSavedRoom = false;
+
+        foreach (RoomInfo room in roomsInSavedRow)
+        {
+            if (room.transform.GetSiblingIndex() == savedRoomID)
+            {
+                foundSavedRoom = true;
+                Debug.Log($"Found Saved Room: {room.name}. Child Count: {room.NextConnectedRooms.Count}");
+
+                if (room.NextConnectedRooms.Count == 0)
+                {
+                    Debug.LogError("The saved room has NO connections! Pathfinding didn't link them.");
+                }
+
+                foreach (RoomInfo nextRoom in room.NextConnectedRooms)
+                {
+                    nextRoom.SetInteractable(true);
+                }
+                break;
+            }
+        }
+
+        if (!foundSavedRoom)
+        {
+            Debug.LogError($"Could not find room with ID {savedRoomID} in Row {savedRow}!");
+        }
+    }
+
+    public void EnterRoom(RoomInfo selectedRoom)
+    {
+        int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
+
+        if (roomRowIndex == _rows.Count - 1)
+        {
+            ResetMapProgress();
+            return;
+        }
+
+        _mapData.CurrentRow = roomRowIndex;
+        _mapData.CurrentRoom = selectedRoom.transform.GetSiblingIndex();
+
+        foreach (RectTransform row in _rows)
+        {
+            RoomInfo[] rooms = row.GetComponentsInChildren<RoomInfo>();
+            foreach (RoomInfo room in rooms)
+            {
+                room.SetInteractable(false);
+            }
+        }
+
+        foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
+        {
+            nextRoom.SetInteractable(true);
+        }
+    }
+
+    public void ResetMapProgress()
+    {
+        _mapData.MapSeed = 0;
+        _mapData.CurrentRow = -1;
+        _mapData.CurrentRoom = -1;
+    }
+
     void GeneratePaths()
     {
         foreach (Transform child in _lineParent)
@@ -100,8 +171,7 @@ public class MapHandler : MonoBehaviour
             foreach (RoomInfo currentRoom in currentRowRooms)
             {
                 List<RoomInfo> targets = GetNearestRooms(currentRoom, nextRowRooms);
-                if (targets.Count == 0)
-                    continue;
+                if (targets.Count == 0) continue;
 
                 DrawLine(currentRoom.GetComponent<RectTransform>(), targets[0].GetComponent<RectTransform>());
                 nextRowReached.Add(targets[0]);
@@ -115,9 +185,7 @@ public class MapHandler : MonoBehaviour
 
             foreach (RoomInfo nextRoom in nextRowRooms)
             {
-                if (nextRowReached.Contains(nextRoom))
-                    continue;
-
+                if (nextRowReached.Contains(nextRoom)) continue;
                 List<RoomInfo> sources = GetNearestRooms(nextRoom, currentRowRooms);
                 if (sources.Count > 0)
                 {
@@ -129,25 +197,19 @@ public class MapHandler : MonoBehaviour
 
     List<RoomInfo> GetNearestRooms(RoomInfo currentRoom, RoomInfo[] connectableRooms)
     {
-        RoomInfo closest = null;
-        RoomInfo second = null;
-        float min = float.MaxValue;
-        float secondMin = float.MaxValue;
+        RoomInfo closest = null; RoomInfo second = null;
+        float min = float.MaxValue; float secondMin = float.MaxValue;
 
         foreach (RoomInfo next in connectableRooms)
         {
             float dist = (currentRoom.transform.position - next.transform.position).sqrMagnitude;
             if (dist < min)
             {
-                secondMin = min;
-                second = closest;
-                min = dist;
-                closest = next;
+                secondMin = min; second = closest; min = dist; closest = next;
             }
             else if (dist < secondMin)
             {
-                secondMin = dist;
-                second = next;
+                secondMin = dist; second = next;
             }
         }
 
@@ -156,104 +218,16 @@ public class MapHandler : MonoBehaviour
             results.Add(closest);
         if (second != null)
             results.Add(second);
-
         return results;
-    }
-
-    public void ManageInitialSelections()
-    {
-        int savedRow = PlayerPrefs.GetInt(MapPrefs.Row, -1);
-        int savedRoomID = PlayerPrefs.GetInt(MapPrefs.RoomID, -1);
-
-        Debug.Log($"THIS IS THE SAVED ROW!!!!{savedRow}");
-        Debug.Log($"THIS IS THE SAVED ROOMID!!!!{savedRoomID}");
-
-
-        for (int row = 0; row < _rows.Count; row++)
-        {
-            RoomInfo[] roomsInRow = _rows[row].GetComponentsInChildren<RoomInfo>();
-
-            foreach (RoomInfo room in roomsInRow)
-            {
-                if (savedRow == -1)
-                {
-                    room.SetInteractable(row == 0);
-                }
-                else
-                {
-                    if (row == savedRow && room.transform.GetSiblingIndex() == savedRoomID)
-                    {
-                        Debug.Log($"Found Saved Room: {room.name}. Connections count: {room.NextConnectedRooms.Count}");
-
-                        foreach (RoomInfo nextRoom in room.NextConnectedRooms)
-                        {
-                            Debug.Log($"next room is {nextRoom}");
-                            nextRoom.SetInteractable(true);
-                        }
-                    }
-                    else
-                    {
-                        room.SetInteractable(false);
-                    }
-                }
-            }
-        }
-    }
-
-    public void EnterRoom(RoomInfo selectedRoom)
-    {
-        int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
-
-        if (roomRowIndex == _rows.Count - 1)
-        {
-            ResetMapProgress();
-            return;
-        }
-
-        PlayerPrefs.SetInt(MapPrefs.Row, roomRowIndex);
-        PlayerPrefs.SetInt(MapPrefs.RoomID, selectedRoom.transform.GetSiblingIndex());
-        PlayerPrefs.Save();
-
-        foreach (RectTransform row in _rows)
-        {
-            RoomInfo[] rooms = row.GetComponentsInChildren<RoomInfo>();
-            foreach (RoomInfo room in rooms)
-            {
-                room.SetInteractable(false);
-            }
-        }
-
-        foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
-        {
-            Debug.Log("New rooms selection");
-            nextRoom.SetInteractable(true);
-        }
-    }
-
-    public void ResetMapProgress()
-    {
-        _masterSeed = 0;
-        if (_mapData != null)
-            _mapData.CurrentRow = 0;
-
-        PlayerPrefs.DeleteKey(MapPrefs.Seed);
-        PlayerPrefs.DeleteKey(MapPrefs.Row);
-        PlayerPrefs.DeleteKey(MapPrefs.RoomID);
-        PlayerPrefs.DeleteKey(MapPrefs.LastRow);
-        PlayerPrefs.Save();
     }
 
     void StoreRoomPaths(RectTransform start, RectTransform end)
     {
         RoomInfo startRoom = start.GetComponent<RoomInfo>();
         RoomInfo endRoom = end.GetComponent<RoomInfo>();
-
-        if (startRoom && endRoom != null)
+        if (startRoom && endRoom != null && !startRoom.NextConnectedRooms.Contains(endRoom))
         {
-            if (!startRoom.NextConnectedRooms.Contains(endRoom))
-            {
-                startRoom.NextConnectedRooms.Add(endRoom);
-            }
+            startRoom.NextConnectedRooms.Add(endRoom);
         }
     }
 
@@ -262,12 +236,18 @@ public class MapHandler : MonoBehaviour
         GameObject lineObj = Instantiate(_linePrefab, _lineParent);
         RectTransform lineRect = lineObj.GetComponent<RectTransform>();
 
-        Vector2 direction = end.position - start.position;
-        lineRect.position = start.position + (Vector3)(direction / 2f);
+        Vector3 startPos = _lineParent.InverseTransformPoint(start.position);
+        Vector3 endPos = _lineParent.InverseTransformPoint(end.position);
+
+        Vector2 direction = endPos - startPos;
+        float distance = direction.magnitude;
+
+        lineRect.localPosition = startPos + (Vector3)(direction / 2f);
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        lineRect.rotation = Quaternion.Euler(0, 0, angle);
-        lineRect.sizeDelta = new Vector2(direction.magnitude, 15f);
+        lineRect.localRotation = Quaternion.Euler(0, 0, angle);
+
+        lineRect.sizeDelta = new Vector2(distance, 15f);
 
         lineObj.transform.SetAsFirstSibling();
         StoreRoomPaths(start, end);
@@ -276,41 +256,30 @@ public class MapHandler : MonoBehaviour
     int NumberOfRoomsInRow(int currentRow)
     {
         if (currentRow == 0)
-        {
             return Random.Range(2, 4);
-        }
-
         if (currentRow == _rows.Count - 1)
-        {
             return 1;
-        }
-
         float noise = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
-
-        if (noise > 0.5f)
-        {
-            return Random.Range(2, 4);
-        }
-        else
-        {
-            return Random.Range(1, 3);
-        }
+        return noise > 0.5f ? Random.Range(2, 4) : Random.Range(1, 3);
     }
 
     RoomData RandomizeRoomData(int row)
     {
-        if (row == 0 || row == _rows.Count - 1) return _combatData;
+        if (row == 0 || row == _rows.Count - 1)
+            return _combatData;
 
         float randomValue = Random.value;
-        if (randomValue < _combatRoomSpawnChance) return _combatData;
-        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance)) return _eventData;
+
+        if (randomValue < _combatRoomSpawnChance)
+            return _combatData;
+        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance))
+            return _eventData;
         return _restData;
     }
 
     void SpawnRoomSelection(RoomData roomData, int row)
     {
         GameObject newRoom = Instantiate(_roomSelectionPrefab, _rows[row]);
-
         newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this);
     }
 

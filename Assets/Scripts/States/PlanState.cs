@@ -13,6 +13,7 @@ public class PlanState : TurnState
     {
         base.Enter();
         Debug.Log("Enter PlanState");
+        _currentActiveUnit.PlanStateInitialResources();
         LoadSelections();
     }
 

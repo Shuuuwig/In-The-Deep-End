@@ -6,11 +6,11 @@ public class BattleHandler : StateMachine
 {
     [Header("Room Data")]
     [SerializeField] protected RoomData _currentRoomData;
-    [SerializeField] protected MapData _mapRoomData;
+    [SerializeField] protected MapData _mapData;
     protected TeamData _teamData;
-    [SerializeField] protected List<BattleData> Tier1Battle = new List<BattleData>();
-    [SerializeField] protected List<BattleData> Tier2Battle = new List<BattleData>();
-    [SerializeField] protected List<BattleData> Tier3Battle = new List<BattleData>();
+    [SerializeField] protected List<BattleData> _tier1Battle = new List<BattleData>();
+    [SerializeField] protected List<BattleData> _tier2Battle = new List<BattleData>();
+    [SerializeField] protected List<BattleData> _tier3Battle = new List<BattleData>();
     protected BattleData _battleData;
 
     [Header("Scene References")]
@@ -32,7 +32,7 @@ public class BattleHandler : StateMachine
     protected string _playerUnitTag = "PlayerUnit";
     protected string _enemyUnitTag = "EnemyUnit";
 
-    public MapData MapRoomData => _mapRoomData;
+    public MapData MapRoomData => _mapData;
     public string PlayerUnitTag => _playerUnitTag;
     public string EnemyUnitTag => _enemyUnitTag;
     public GameObject PlayerGraveyard => _playerGraveyard;
@@ -64,7 +64,7 @@ public class BattleHandler : StateMachine
 
     public void InitializeBattle()
     {
-        _battleData = CombatFunctions.SelectBattleData(Tier1Battle, Tier2Battle, Tier3Battle);
+        _battleData = CombatFunctions.SelectBattleData(_tier1Battle, _tier2Battle, _tier3Battle, _mapData);
         _teamData = Resources.Load<TeamData>("TeamData/PlayerTeamData");
 
         for (int i = 0; i < _teamData.UnitsInParty.Count; i++)
@@ -142,7 +142,7 @@ public class BattleHandler : StateMachine
     {
 
         TurnFunctions.UpdateTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag,
-                _playerGraveyard, _enemyGraveyard, _mapRoomData);
+                _playerGraveyard, _enemyGraveyard, _mapData);
         _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
         UnitTurn();
     }

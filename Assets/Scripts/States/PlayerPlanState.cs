@@ -44,6 +44,8 @@ public class PlayerPlanState : PlanState
 
             _currentActiveUnit.ResetActionCount();
             _currentActiveUnit.ClearAction();
+            
+            _battleHandler.TargetedUnits.Clear();
 
             _combatUIHandler.HideCurrentIndicator();
             _combatUIHandler.ResetTargetsIndicators();

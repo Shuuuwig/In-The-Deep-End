@@ -27,6 +27,16 @@ public class EnemyCrewmate : Unit
 
     }
 
+    public override void ResetActionCount()
+    {
+
+    }
+
+    public override void PlanStateInitialResources()
+    {
+        
+    }
+
     public override void ClearAction()
     {
         ActionUsed = null;
@@ -37,10 +47,7 @@ public class EnemyCrewmate : Unit
 
     }
 
-    public override void ResetActionCount()
-    {
 
-    }
 
     public override bool CanCounter()
     {

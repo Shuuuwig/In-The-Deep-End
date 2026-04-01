@@ -66,14 +66,13 @@ public static class CombatFunctions
         _combatUIHandler = combatUIHandler;
     }
 
-    public static BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> tier3Battle)
+    public static BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> tier3Battle, MapData mapData)
     {
-        if (PlayerPrefs.GetInt(MapPrefs.Row) <= 2)
+        if (mapData.CurrentRow <= 2)
             return tier1Battle[Random.Range(0, tier1Battle.Count)];
-
-        if (PlayerPrefs.GetInt(MapPrefs.Row) == PlayerPrefs.GetInt(MapPrefs.LastRow))
-            return tier3Battle[Random.Range(0, tier3Battle.Count)];
-        return tier2Battle[Random.Range(0, tier2Battle.Count)];
+        else if (mapData.CurrentRow < mapData.NumberOfRows)
+            return tier2Battle[Random.Range(0, tier2Battle.Count)];
+        return tier3Battle[Random.Range(0, tier3Battle.Count)];
     }
 
     public static void ResetActionCount(Unit currentActiveUnit)
