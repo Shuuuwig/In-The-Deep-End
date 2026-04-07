@@ -47,7 +47,7 @@ public static class TurnFunctions
         if (!playerAlive || !enemyAlive)
         {
             // change to victory ui later
-            RoomHandler.GoToRoom(mapRoom);
+            SceneHandler.GoToRoom(mapRoom);
             return;
         }
 

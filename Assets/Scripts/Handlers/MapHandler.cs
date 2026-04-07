@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class MapHandler : MonoBehaviour
 {
+    [Header("Input & Navigation")]
+    [SerializeField] EventSystem _eventSystem;
+
     [Header("Horizontal Rows")]
     [SerializeField] List<RectTransform> _rows = new List<RectTransform>();
 
@@ -32,6 +36,9 @@ public class MapHandler : MonoBehaviour
 
     void Start()
     {
+        if (_eventSystem == null)
+            _eventSystem = EventSystem.current;
+
         if (_mapData.MapSeed != 0)
         {
             _masterSeed = _mapData.MapSeed;
@@ -77,8 +84,7 @@ public class MapHandler : MonoBehaviour
     {
         int savedRow = _mapData.CurrentRow;
         int savedRoomID = _mapData.CurrentRoom;
-
-        Debug.Log($"Checking Progress: Row {savedRow}, ID {savedRoomID}");
+        GameObject objectToSelect = null;
 
         foreach (var rowRect in _rows)
         {
@@ -88,37 +94,37 @@ public class MapHandler : MonoBehaviour
 
         if (savedRow == -1)
         {
-            foreach (var room in _rows[0].GetComponentsInChildren<RoomInfo>())
+            RoomInfo[] firstRowRooms = _rows[0].GetComponentsInChildren<RoomInfo>();
+            foreach (var room in firstRowRooms)
                 room.SetInteractable(true);
-            return;
+
+            if (firstRowRooms.Length > 0)
+                objectToSelect = firstRowRooms[0].gameObject;
         }
-
-        RoomInfo[] roomsInSavedRow = _rows[savedRow].GetComponentsInChildren<RoomInfo>();
-        bool foundSavedRoom = false;
-
-        foreach (RoomInfo room in roomsInSavedRow)
+        else
         {
-            if (room.transform.GetSiblingIndex() == savedRoomID)
+            RoomInfo[] roomsInSavedRow = _rows[savedRow].GetComponentsInChildren<RoomInfo>();
+
+            foreach (RoomInfo room in roomsInSavedRow)
             {
-                foundSavedRoom = true;
-                Debug.Log($"Found Saved Room: {room.name}. Child Count: {room.NextConnectedRooms.Count}");
-
-                if (room.NextConnectedRooms.Count == 0)
+                if (room.transform.GetSiblingIndex() == savedRoomID)
                 {
-                    Debug.LogError("The saved room has NO connections! Pathfinding didn't link them.");
-                }
+                    // Enable the connected rooms
+                    foreach (RoomInfo nextRoom in room.NextConnectedRooms)
+                    {
+                        nextRoom.SetInteractable(true);
 
-                foreach (RoomInfo nextRoom in room.NextConnectedRooms)
-                {
-                    nextRoom.SetInteractable(true);
+                        if (objectToSelect == null)
+                            objectToSelect = nextRoom.gameObject;
+                    }
+                    break;
                 }
-                break;
             }
         }
 
-        if (!foundSavedRoom)
+        if (_eventSystem != null && objectToSelect != null)
         {
-            Debug.LogError($"Could not find room with ID {savedRoomID} in Row {savedRow}!");
+            _eventSystem.SetSelectedGameObject(objectToSelect);
         }
     }
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class RoomHandler : MonoBehaviour
+public class SceneHandler : MonoBehaviour
 {
     public static GameObject _Instance;
 
@@ -16,5 +16,10 @@ public class RoomHandler : MonoBehaviour
         SceneManager.LoadScene(2);
         Debug.Log("ROOM");
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    } 
 }
 

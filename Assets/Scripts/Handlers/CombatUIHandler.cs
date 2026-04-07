@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class CombatUIHandler : MonoBehaviour
 {
+    [Header("Input & Navigation")]
+    [SerializeField] EventSystem _eventSystem;
+
     [Header("Core References")]
     [SerializeField] private BattleHandler _battleHandler;
 
@@ -44,6 +48,9 @@ public class CombatUIHandler : MonoBehaviour
 
     protected void Awake()
     {
+        if (_eventSystem == null)
+            _eventSystem = EventSystem.current;
+
         foreach (GameObject selection in _movesetSelections)
         {
             Button button = selection.GetComponent<Button>();
@@ -173,7 +180,6 @@ public class CombatUIHandler : MonoBehaviour
             if (movePair.Key == null)
                 continue;
 
-            // Local copy of index for the Lambda
             int index = i;
             UnityAction moveAction = movePair.Key;
             ActionData moveData = movePair.Value;
