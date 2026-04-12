@@ -46,14 +46,14 @@ public class InputHandler : MonoBehaviour
     void Update()
     {
         _horizontalValue = _navigateMovesetAction.ReadValue<Vector2>().x;
-        _verticalValue = _navigateMovesetAction.ReadValue<Vector2>().x;
+        _verticalValue = _navigateMovesetAction.ReadValue<Vector2>().y;
 
-        if (_verticalValue != 0)
+        if (_horizontalValue != 0)
         {
             if (_navigateMovesetAction.WasPressedThisFrame())
             {
-                Debug.Log($"Vertical Value: {_verticalValue}");
-                NavigateMovesetEvent?.Invoke(this, new InfoEventArgs<int>((int)_verticalValue));
+                Debug.Log($"Horizontal Value: {_horizontalValue}");
+                NavigateMovesetEvent?.Invoke(this, new InfoEventArgs<int>((int)_horizontalValue));
             }
         }
 

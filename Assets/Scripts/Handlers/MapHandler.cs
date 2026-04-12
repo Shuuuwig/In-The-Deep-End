@@ -39,6 +39,7 @@ public class MapHandler : MonoBehaviour
         if (_eventSystem == null)
             _eventSystem = EventSystem.current;
 
+        // Sync local master seed with the ScriptableObject
         if (_mapData.MapSeed != 0)
         {
             _masterSeed = _mapData.MapSeed;
@@ -47,6 +48,7 @@ public class MapHandler : MonoBehaviour
         {
             _masterSeed = Random.Range(1, 1000000);
             _mapData.MapSeed = _masterSeed;
+            _mapData.SaveProgress();
         }
 
         _mapData.NumberOfRows = _rows.Count;
@@ -109,11 +111,9 @@ public class MapHandler : MonoBehaviour
             {
                 if (room.transform.GetSiblingIndex() == savedRoomID)
                 {
-                    // Enable the connected rooms
                     foreach (RoomInfo nextRoom in room.NextConnectedRooms)
                     {
                         nextRoom.SetInteractable(true);
-
                         if (objectToSelect == null)
                             objectToSelect = nextRoom.gameObject;
                     }
@@ -130,16 +130,8 @@ public class MapHandler : MonoBehaviour
 
     public void EnterRoom(RoomInfo selectedRoom)
     {
-        int roomRowIndex = _rows.IndexOf(selectedRoom.transform.parent.GetComponent<RectTransform>());
-
-        if (roomRowIndex == _rows.Count - 1)
-        {
-            ResetMapProgress();
-            return;
-        }
-
-        _mapData.CurrentRow = roomRowIndex;
         _mapData.CurrentRoom = selectedRoom.transform.GetSiblingIndex();
+        _mapData.SaveProgress();
 
         foreach (RectTransform row in _rows)
         {
@@ -150,17 +142,12 @@ public class MapHandler : MonoBehaviour
             }
         }
 
-        foreach (RoomInfo nextRoom in selectedRoom.NextConnectedRooms)
-        {
-            nextRoom.SetInteractable(true);
-        }
+        Debug.Log($"Entered Room {_mapData.CurrentRoom} on Row {_mapData.CurrentRow}. Waiting for victory to advance.");
     }
 
     public void ResetMapProgress()
     {
-        _mapData.MapSeed = 0;
-        _mapData.CurrentRow = -1;
-        _mapData.CurrentRoom = -1;
+        _mapData.ResetProgress();
     }
 
     void GeneratePaths()
@@ -177,7 +164,8 @@ public class MapHandler : MonoBehaviour
             foreach (RoomInfo currentRoom in currentRowRooms)
             {
                 List<RoomInfo> targets = GetNearestRooms(currentRoom, nextRowRooms);
-                if (targets.Count == 0) continue;
+                if (targets.Count == 0)
+                    continue;
 
                 DrawLine(currentRoom.GetComponent<RectTransform>(), targets[0].GetComponent<RectTransform>());
                 nextRowReached.Add(targets[0]);
@@ -203,8 +191,10 @@ public class MapHandler : MonoBehaviour
 
     List<RoomInfo> GetNearestRooms(RoomInfo currentRoom, RoomInfo[] connectableRooms)
     {
-        RoomInfo closest = null; RoomInfo second = null;
-        float min = float.MaxValue; float secondMin = float.MaxValue;
+        RoomInfo closest = null;
+        RoomInfo second = null;
+        float min = float.MaxValue;
+        float secondMin = float.MaxValue;
 
         foreach (RoomInfo next in connectableRooms)
         {
@@ -249,10 +239,8 @@ public class MapHandler : MonoBehaviour
         float distance = direction.magnitude;
 
         lineRect.localPosition = startPos + (Vector3)(direction / 2f);
-
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         lineRect.localRotation = Quaternion.Euler(0, 0, angle);
-
         lineRect.sizeDelta = new Vector2(distance, 15f);
 
         lineObj.transform.SetAsFirstSibling();
@@ -261,25 +249,20 @@ public class MapHandler : MonoBehaviour
 
     int NumberOfRoomsInRow(int currentRow)
     {
-        if (currentRow == 0)
-            return Random.Range(2, 4);
-        if (currentRow == _rows.Count - 1)
-            return 1;
+        if (currentRow == 0) return Random.Range(2, 4);
+        if (currentRow == _rows.Count - 1) return 1;
+
         float noise = Mathf.PerlinNoise(currentRow * _noiseScale + _xOffset, _yOffset);
         return noise > 0.5f ? Random.Range(2, 4) : Random.Range(1, 3);
     }
 
     RoomData RandomizeRoomData(int row)
     {
-        if (row == 0 || row == _rows.Count - 1)
-            return _combatData;
+        if (row == 0 || row == _rows.Count - 1) return _combatData;
 
         float randomValue = Random.value;
-
-        if (randomValue < _combatRoomSpawnChance)
-            return _combatData;
-        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance))
-            return _eventData;
+        if (randomValue < _combatRoomSpawnChance) return _combatData;
+        if (randomValue < (_combatRoomSpawnChance + _eventRoomSpawnChance)) return _eventData;
         return _restData;
     }
 

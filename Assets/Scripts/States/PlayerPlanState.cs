@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerPlanState : PlanState
 {
+    bool _selectionMade;
+
     protected override void AddListeners()
     {
         base.AddListeners();
@@ -44,8 +46,8 @@ public class PlayerPlanState : PlanState
 
             _currentActiveUnit.ResetActionCount();
             _currentActiveUnit.ClearAction();
-            
-            _battleHandler.TargetedUnits.Clear();
+
+            CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);
 
             _combatUIHandler.HideCurrentIndicator();
             _combatUIHandler.ResetTargetsIndicators();
@@ -58,13 +60,21 @@ public class PlayerPlanState : PlanState
 
     protected void OnConfirmAction(object sender, InfoEventArgs<bool> e)
     {
+        if (_selectionMade)
+        {
+            _selectionMade = false;
+            return;
+        }
+
         if (_currentActiveUnit.ActionUsed == null)
             return;
 
         Debug.Log("Target Confirmed");
         Debug.Log($"UNIT NOW: {_currentActiveUnit}");
+
         _currentActiveUnit.CurrentActionCount++;
         _combatUIHandler.SaveSelectedTargets();
+
         Debug.Log($"Current count: {_currentActiveUnit.CurrentActionCount}, Max count: {_currentActiveUnit.MaxActionCount}");
 
         if (_currentActiveUnit.CurrentActionCount >= _currentActiveUnit.MaxActionCount)
@@ -114,5 +124,7 @@ public class PlayerPlanState : PlanState
 
         _combatUIHandler.HideSelections();
         _combatUIHandler.ShowCurrentIndicator();
+
+        _selectionMade = true;
     }
 }

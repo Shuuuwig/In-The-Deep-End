@@ -34,6 +34,7 @@ public class PlayerGunslingerUnit : Unit
         {
             _moveset.Add(Reload, _actionDatas[0]);
         }
+
         if (_currentAmmo > 0)
         {
             if (!_moveset.ContainsKey(Multishot))
@@ -79,6 +80,7 @@ public class PlayerGunslingerUnit : Unit
     {
         AmmoCheck();
     }
+
     public override void ResetActionCount()
     {
         CurrentActionCount = 0;
@@ -91,6 +93,7 @@ public class PlayerGunslingerUnit : Unit
     {
         _savedAmmo = _currentAmmo;
         _maxActionCount = _savedAmmo;
+        UpdateMoveset();
     }
 
     public override void ClearAction()

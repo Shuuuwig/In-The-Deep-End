@@ -29,7 +29,7 @@ public static class TurnFunctions
     }
 
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
-                                    GameObject playerGraveyard, GameObject enemyGraveyard, MapData mapRoom)
+                                    GameObject playerGraveyard, GameObject enemyGraveyard, MapData mapData)
     {
         activeUnits = SortActiveUnits(activeUnits);
 
@@ -47,7 +47,8 @@ public static class TurnFunctions
         if (!playerAlive || !enemyAlive)
         {
             // change to victory ui later
-            SceneHandler.GoToRoom(mapRoom);
+            mapData.AdvanceRow();
+            SceneHandler.GoToMap();
             return;
         }
 

@@ -466,11 +466,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 251407915}
         m_TargetAssemblyTypeName: SceneHandler, Assembly-CSharp
-        m_MethodName: GoToRoom
-        m_Mode: 2
+        m_MethodName: GoToMap
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: 86a0e46a38de2ac42872d9abfdb4435d, type: 2}
-          m_ObjectArgumentAssemblyTypeName: MapData, Assembly-CSharp
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

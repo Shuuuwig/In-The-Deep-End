@@ -13,6 +13,7 @@ public class CombatUIHandler : MonoBehaviour
 
     [Header("Core References")]
     [SerializeField] private BattleHandler _battleHandler;
+    [SerializeField] private MapData _mapData;
 
     [Header("UI Panels & Prefabs")]
     [SerializeField] private GameObject _actionPanel;
@@ -50,6 +51,9 @@ public class CombatUIHandler : MonoBehaviour
     {
         if (_eventSystem == null)
             _eventSystem = EventSystem.current;
+
+        if (_mapData == null)
+            _mapData = Resources.Load<MapData>("Maps/SavedMapData");
 
         foreach (GameObject selection in _movesetSelections)
         {
@@ -133,24 +137,19 @@ public class CombatUIHandler : MonoBehaviour
 
             if (unit.IsPlayer)
             {
-                _playerHealthbars[uiIndex].gameObject.SetActive(true);
-                _unitNames[uiIndex].text = unit.name;
+                if (uiIndex >= 0 && uiIndex < _playerHealthbars.Count)
+                {
+                    _playerHealthbars[uiIndex].gameObject.SetActive(true);
+                    _unitNames[uiIndex].text = unit.name;
+                }
             }
             else
             {
-                _enemyHealthbars[uiIndex].gameObject.SetActive(true);
+                if (uiIndex >= 0 && uiIndex < _enemyHealthbars.Count)
+                {
+                    _enemyHealthbars[uiIndex].gameObject.SetActive(true);
+                }
             }
-
-            Slider targetSlider = _playerHealthbars[unit.SpawnIndex];
-
-            if (targetSlider == null)
-            {
-                Debug.LogError($"Slider at index {unit.SpawnIndex} is NULL on {gameObject.name}. " +
-                               "Check if the reference was lost during scene load!");
-                continue;
-            }
-
-            targetSlider.gameObject.SetActive(true);
         }
     }
 
@@ -170,6 +169,7 @@ public class CombatUIHandler : MonoBehaviour
             }
         }
     }
+
     public void SetupSelections(int movesetCount, Dictionary<UnityAction, ActionData> moveset, UnityAction acting)
     {
         _actionPanel.SetActive(true);
@@ -189,7 +189,12 @@ public class CombatUIHandler : MonoBehaviour
             _movesetButtons[index].onClick.AddListener(acting);
 
             _movesetButtonText[index].text = moveData.ActionName;
+
+            if (i == 0)
+                _eventSystem.SetSelectedGameObject(_movesetSelections[i]);
         }
+
+        PlayerPrefs.Save();
     }
 
     public void HideSelections()
@@ -312,7 +317,7 @@ public class CombatUIHandler : MonoBehaviour
         }
 
         _currentTargetIndicator = null;
-        _currentTargetedPosition = null; // check here later
+        _currentTargetedPosition = null;
     }
 
     public void SaveSelectedTargets()

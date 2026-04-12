@@ -12,9 +12,8 @@ public class EnemyCaptain : Unit
 
     protected override void UpdateMoveset()
     {
-        _moveset.Clear();
         _moveset.Add(Slash, _actionDatas[0]);
-        _moveset.Add(AllHandOnDeck, _actionDatas[1]);
+        //_moveset.Add(AllHandsOnDeck, _actionDatas[1]);
     }
 
     protected override void UnitUniqueUI()
@@ -66,7 +65,7 @@ public class EnemyCaptain : Unit
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
     }
 
-    protected void AllHandOnDeck()
+    protected void AllHandsOnDeck()
     {
 
     }
