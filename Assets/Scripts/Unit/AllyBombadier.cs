@@ -1,16 +1,66 @@
 using UnityEngine;
 
-public class AllyBombadier : MonoBehaviour
+public class AllyBombadier : Unit
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void InitializeUnit()
     {
-        
+        base.InitializeUnit();
+
+        UpdateMoveset();
+        UnitUniqueUI();
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void UpdateMoveset()
     {
-        
+        _moveset.Clear();
+        _moveset.Add(Bombardment, _actionDatas[0]);
+    }
+
+    protected override void UnitUniqueUI()
+    {
+
+    }
+
+    public override void CheckActionCount()
+    {
+
+    }
+
+    public override void ResetActionCount()
+    {
+        CurrentActionCount = 0;
+    }
+
+    public override void PlanStateInitialResources()
+    {
+
+    }
+
+    public override void ClearAction()
+    {
+        ActionUsed = null;
+    }
+
+    public override void StatusCheck()
+    {
+
+    }
+
+    public override bool CanCounter()
+    {
+        return false;
+    }
+
+    public override void Countered(object sender, InfoEventArgs<bool> e)
+    {
+
+    }
+
+    protected void Bombardment()
+    {
+        ActionUsed = Bombardment;
+
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+        _maxActionCount = _actionDatas[0].MaxActionCount;
     }
 }

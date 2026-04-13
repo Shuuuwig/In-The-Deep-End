@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccfa9c5d9abb7394688060f157e7c884, type: 3}
   m_Name: AllyGunslingerUnitData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
-  MaxHealthPoints: 15
+  UnitPrefab: {fileID: 1369066931782130860, guid: 02fdeba910516494e93f5fb0a1058894, type: 3}
+  MaxHealthPoints: 21
   MaxResolvePoints: 10
   BaseSpeed: 8
-  BaseDamage: 6
+  BaseDamage: 1.5
   CharacterSprite: {fileID: 414791529868003996, guid: f9151163bdc630d469e912d07af869ab, type: 3}
   CharacterIcons:
   - {fileID: 0}

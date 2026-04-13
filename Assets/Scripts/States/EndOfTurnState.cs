@@ -10,6 +10,7 @@ public class EndOfTurnState : TurnState
         _battleHandler.Checkgraveyard();
         _combatUIHandler.ResetTargetsIndicators();
 
+        _currentActiveUnit.ResetActionCount();
         _currentActiveUnit.ClearAction();
         _currentActiveUnit.StatusCheck();
         CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);

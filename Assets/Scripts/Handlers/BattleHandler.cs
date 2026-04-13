@@ -70,9 +70,13 @@ public class BattleHandler : StateMachine
         for (int i = 0; i < _teamData.UnitsInParty.Count; i++)
         {
             if (_teamData.UnitsInParty[i] == null)
+            {
                 break;
+            }
 
             GameObject playerObject = Instantiate(_teamData.UnitsInParty[i], _playerSpawnPos[i].transform);
+
+            playerObject.name = _teamData.UnitsInParty[i].name;
             playerObject.transform.localPosition = new Vector3(0, 0, 10);
 
             Unit playerUnit = playerObject.GetComponent<Unit>();
@@ -87,9 +91,13 @@ public class BattleHandler : StateMachine
         for (int i = 0; i < _battleData.EnemyUnitsInBattle.Count; i++)
         {
             if (_battleData.EnemyUnitsInBattle[i] == null)
+            {
                 break;
+            }
 
             GameObject enemyObject = Instantiate(_battleData.EnemyUnitsInBattle[i], _enemySpawnPos[i].transform);
+
+            enemyObject.name = _battleData.EnemyUnitsInBattle[i].name;
             enemyObject.transform.localPosition = new Vector3(0, 0, 10);
 
             Unit enemyUnit = enemyObject.GetComponent<Unit>();

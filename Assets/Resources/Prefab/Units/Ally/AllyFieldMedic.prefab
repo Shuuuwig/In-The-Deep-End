@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: -7986960153405097925, guid: 3cdb5956865c5784b943aaecc40bc169, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 7556826013097528477}
   m_Layer: 0
   m_Name: AllyFieldMedic
-  m_TagString: Untagged
+  m_TagString: PlayerUnit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -288,3 +288,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c4adbf277ba1ea4da3ab3dcad625cd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AllyFieldMedic
+  _unitData: {fileID: 11400000, guid: a2a2bd0e7dc8e2c4ca743b5f9abe0a20, type: 2}
+  _audioSource: {fileID: 4114690228218464270}
+  _animator: {fileID: 3434029480404573366}
+  SpawnIndex: 0
+  IsPlayer: 0
+  _statusEffects: []
+  CurrentHealthPoints: 0
+  CurrentSpeed: 0
+  CurrentDamage: 0
+  CurrentTurnValue: 0
+  CurrentActionCount: 0
+  DefaultIdleClip: {fileID: 0}
+  AttackAnimation: {fileID: 0}
+  TakenDamage: {fileID: 0}
+  DamageSound: {fileID: 0}
+  TakenDamageSound: {fileID: 0}

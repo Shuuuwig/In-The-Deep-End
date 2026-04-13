@@ -9,26 +9,47 @@ public class MainMenuHandler : MonoBehaviour
     [SerializeField] Button _newGameButton;
     [SerializeField] EventSystem _eventSystem;
     [SerializeField] MapData _mapData;
+    [SerializeField] TeamData _teamData;
 
     void Awake()
     {
-
-
         if (_eventSystem == null)
+        {
             _eventSystem = EventSystem.current;
+        }
 
         if (_mapData == null)
+        {
             _mapData = Resources.Load<MapData>("Maps/SavedMapData");
+        }
 
         LoadMapDataFromPrefs();
 
-        if (_mapData.MapSeed != 0)
+        if (_teamData == null)
+        {
+            _teamData = Resources.Load<TeamData>("TeamData/PlayerTeamData");
+        }
+
+        LoadPlayerTeamDataFromPrefs();
+
+        bool hasTeam = false;
+        foreach (GameObject unit in _teamData.UnitsInParty)
+        {
+            if (unit != null)
+            {
+                hasTeam = true;
+                break;
+            }
+        }
+
+        if (_mapData.MapSeed != 0 && hasTeam)
         {
             _continueButton.interactable = true;
             _eventSystem.SetSelectedGameObject(_continueButton.gameObject);
         }
         else
         {
+            _continueButton.interactable = false;
             _eventSystem.SetSelectedGameObject(_newGameButton.gameObject);
         }
     }
@@ -46,8 +67,24 @@ public class MainMenuHandler : MonoBehaviour
         }
     }
 
+    void LoadPlayerTeamDataFromPrefs()
+    {
+        _teamData.LoadTeam();
+    }
+
     public void ResetProgress()
     {
         _mapData.ResetProgress();
+        foreach (GameObject prefab in _teamData.UnitsInParty)
+        {
+            if (prefab != null)
+            {
+                UnitData data = prefab.GetComponent<Unit>().UnitData;
+                data.ResetCurrentStats();
+                Debug.Log("RESET STATS");
+            }
+        }
+        _teamData.ResetTeam();
+
     }
 }

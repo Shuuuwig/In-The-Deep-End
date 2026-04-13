@@ -84,7 +84,7 @@ public class PlayerGunslingerUnit : Unit
     public override void ResetActionCount()
     {
         CurrentActionCount = 0;
-        _currentAmmo = _savedAmmo;
+        _savedAmmo = _currentAmmo;
         UpdateAmmoText();
         UpdateMoveset();
     }
@@ -93,6 +93,7 @@ public class PlayerGunslingerUnit : Unit
     {
         _savedAmmo = _currentAmmo;
         _maxActionCount = _savedAmmo;
+        Debug.Log($"INITIAL AMMO {_maxActionCount}");
         UpdateMoveset();
     }
 

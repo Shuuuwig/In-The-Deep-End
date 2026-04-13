@@ -52,13 +52,18 @@ public abstract class Unit : MonoBehaviour
     protected List<AudioClip> _audioClips => _unitData.AudioClips;
     protected List<AnimationClip> _animationClips => _unitData.AnimationClips;
 
-    public virtual bool IsDead() => CurrentHealthPoints <= 0;
+    public virtual bool IsDead()
+    {
+        return CurrentHealthPoints <= 0;
+    }
 
     protected virtual void Awake()
     {
         if (_animationClips != null && _animationClips.Count > 0)
+        {
             DefaultIdleClip = _animationClips[0];
-            
+        }
+
         UpdateMoveset();
     }
 
@@ -72,13 +77,35 @@ public abstract class Unit : MonoBehaviour
     public virtual void InitializeUnit()
     {
         CurrentActionCount = 0;
+
+        // 1. Load data from PlayerPrefs into the ScriptableObject first
+        if (_unitData != null)
+        {
+            _unitData.LoadStatsPlayerPrefs();
+        }
+
+        // 2. Assign Max stats from the (now updated) UnitData
         MaxHealthPoints = _unitData.MaxHealthPoints;
-        
         MaxResolvePoints = _unitData.MaxResolvePoints;
+
+        // 3. Handle Current Health logic
+        // We check if the saved CurrentHealthPoints is valid (not dead/zero)
+        // If it's 0 or less, we assume it's a new game or full heal and use MaxHP
+        if (_unitData.CurrentHealthPoints > 0)
+        {
+            CurrentHealthPoints = _unitData.CurrentHealthPoints;
+        }
+        else
+        {
+            CurrentHealthPoints = MaxHealthPoints;
+        }
+
+        // 4. Sync the ScriptableObject back just in case we used the MaxHP fallback
+        _unitData.CurrentHealthPoints = CurrentHealthPoints;
+
+        // 5. Initialize the rest of the stats
         BaseSpeed = _unitData.BaseSpeed;
         BaseDamage = _unitData.BaseDamage;
-
-        CurrentHealthPoints = MaxHealthPoints;
         CurrentSpeed = BaseSpeed;
         CurrentDamage = BaseDamage;
 
@@ -86,13 +113,39 @@ public abstract class Unit : MonoBehaviour
         CurrentTurnValue = _baseTurnValue;
     }
 
+    public virtual void UpdateHealth(float amount)
+    {
+        CurrentHealthPoints += amount;
+        CurrentHealthPoints = Mathf.Clamp(CurrentHealthPoints, 0, MaxHealthPoints);
+
+        _unitData.CurrentHealthPoints = CurrentHealthPoints;
+    }
+
+    public virtual void SaveBattleStats()
+    {
+        if (_unitData != null)
+        {
+            _unitData.MaxHealthPoints = MaxHealthPoints;
+            _unitData.CurrentHealthPoints = CurrentHealthPoints;
+            _unitData.BaseSpeed = BaseSpeed;
+            _unitData.BaseDamage = BaseDamage;
+
+            _unitData.SaveStatsPlayerPrefs();
+            Debug.Log($"{name} stats saved after battle.");
+        }
+    }
+
     public virtual void LevelUp(float hpGain, float dmgGain, float speedGain)
     {
-        MaxHealthPoints += hpGain;
-        BaseDamage += dmgGain;
-        BaseSpeed += speedGain;
+        _unitData.MaxHealthPoints += hpGain;
+        _unitData.BaseDamage += dmgGain;
+        _unitData.BaseSpeed += speedGain;
 
-        CurrentHealthPoints = MaxHealthPoints;
+        MaxHealthPoints = _unitData.MaxHealthPoints;
+        BaseDamage = _unitData.BaseDamage;
+        BaseSpeed = _unitData.BaseSpeed;
+
+        UpdateHealth(hpGain);
     }
 
     protected abstract void UpdateMoveset();

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccfa9c5d9abb7394688060f157e7c884, type: 3}
   m_Name: EnemyPirateCaptainUnitData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
+  UnitPrefab: {fileID: 1320377324723924583, guid: dbe73aa7ca5c9be43ae02d41549e4ad0, type: 3}
   MaxHealthPoints: 30
   MaxResolvePoints: 5
-  BaseSpeed: 3
-  BaseDamage: 6
-  CharacterSprite: {fileID: 0}
+  BaseSpeed: 2
+  BaseDamage: 7
+  CharacterSprite: {fileID: -1356457185254977152, guid: 5bac6349972530c4992e81ccd80058bd, type: 3}
   CharacterIcons: []
   MarkedTargetIndicators: []
   AudioClips: []

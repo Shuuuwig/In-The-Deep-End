@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccfa9c5d9abb7394688060f157e7c884, type: 3}
   m_Name: AllyCaptainUnitData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
-  MaxHealthPoints: 25
+  UnitPrefab: {fileID: 306455039785734782, guid: 992009a505f703c40aff2f736f1e6ba6, type: 3}
+  MaxHealthPoints: 30
   MaxResolvePoints: 20
   BaseSpeed: 6
-  BaseDamage: 10
-  CharacterSprite: {fileID: -4343432676925730068, guid: 26eccd9f95d8f3e45bfd4551b5eaedd2, type: 3}
+  BaseDamage: 3
+  CharacterSprite: {fileID: 8943031765037668189, guid: d1c33d4fd4312c94c8c2bc13c99bf4e6, type: 3}
   CharacterIcons: []
   MarkedTargetIndicators:
   - {fileID: 4937886267124531071, guid: e5221f6f9f9ad094b9179976bff7a335, type: 3}

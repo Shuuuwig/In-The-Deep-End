@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2939361895721081575}
   m_Layer: 0
   m_Name: AllyBombadier
-  m_TagString: Untagged
+  m_TagString: PlayerUnit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,6 +46,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56cebc39b8d1b040b9462b6e4ff834f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AllyBombadier
+  _unitData: {fileID: 11400000, guid: 288c6f387d19b7b4a8ae273fa8b8c061, type: 2}
+  _audioSource: {fileID: 2799801990321371828}
+  _animator: {fileID: 2762666617322853412}
+  SpawnIndex: 0
+  IsPlayer: 0
+  _statusEffects: []
+  CurrentHealthPoints: 0
+  CurrentSpeed: 0
+  CurrentDamage: 0
+  CurrentTurnValue: 0
+  CurrentActionCount: 0
+  DefaultIdleClip: {fileID: 0}
+  AttackAnimation: {fileID: 0}
+  TakenDamage: {fileID: 0}
+  DamageSound: {fileID: 0}
+  TakenDamageSound: {fileID: 0}
 --- !u!1 &7354601000721204130
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,7 +142,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: 606815385290419204, guid: 7e5a8c1a1bc41a34fac2c3d52fa472c4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

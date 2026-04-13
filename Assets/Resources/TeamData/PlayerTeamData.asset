@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: PlayerTeamData
   m_EditorClassIdentifier: Assembly-CSharp::TeamData
   UnitsInParty:
+  - {fileID: 3932060674317056381, guid: 784710384a7d1174ba5ef4da214e2c19, type: 3}
   - {fileID: 306455039785734782, guid: 992009a505f703c40aff2f736f1e6ba6, type: 3}
   - {fileID: 1369066931782130860, guid: 02fdeba910516494e93f5fb0a1058894, type: 3}
+  - {fileID: 8475934905558803381, guid: b47217b4a65bd2d459ece79dd558b01e, type: 3}

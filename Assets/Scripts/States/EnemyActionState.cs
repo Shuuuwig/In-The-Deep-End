@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class EnemyActionState : ActionState
 {
+    public override void Enter()
+    {
+        StartCoroutine(HandleActions());
+    }
+
     protected override void AddListeners()
     {
         base.AddListeners();

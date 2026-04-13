@@ -50,17 +50,20 @@ public class CombatUIHandler : MonoBehaviour
     protected void Awake()
     {
         if (_eventSystem == null)
+        {
             _eventSystem = EventSystem.current;
+        }
 
         if (_mapData == null)
+        {
             _mapData = Resources.Load<MapData>("Maps/SavedMapData");
+        }
 
         foreach (GameObject selection in _movesetSelections)
         {
             Button button = selection.GetComponent<Button>();
             _movesetButtons.Add(button);
             _movesetButtonText.Add(button.GetComponentInChildren<TMP_Text>());
-            Debug.Log($"sss {_movesetButtons}");
         }
 
         foreach (GameObject display in _turnValueDisplay)
@@ -72,6 +75,7 @@ public class CombatUIHandler : MonoBehaviour
 
     public void InitializeHealthDisplay()
     {
+        Debug.Log("HEALTH INIT NOW");
         ShowHealthbars();
 
         foreach (Unit unit in _battleHandler.ActiveUnits)
@@ -114,8 +118,6 @@ public class CombatUIHandler : MonoBehaviour
             {
                 _enemyHealthbars[unit.SpawnIndex].value = unit.CurrentHealthPoints;
             }
-
-            Debug.Log($"Updated Health Display for {unit.name}");
         }
 
         HideHealthBars();
@@ -123,13 +125,14 @@ public class CombatUIHandler : MonoBehaviour
 
     public void ShowHealthbars()
     {
+        Debug.Log($"Showing bars for {_battleHandler.ActiveUnits.Count} units.");
         for (int i = 0; i < _battleHandler.ActiveUnits.Count; i++)
         {
             Unit unit = _battleHandler.ActiveUnits[i];
 
             if (unit.IsDead())
             {
-                Debug.Log($"THIS UNIT {unit.name} IS DEAD");
+                Debug.Log($"{unit.name} is considered dead (HP: {unit.CurrentHealthPoints}). Skipping bar.");
                 continue;
             }
 
@@ -178,7 +181,9 @@ public class CombatUIHandler : MonoBehaviour
         {
             var movePair = moveset.ElementAtOrDefault(i);
             if (movePair.Key == null)
+            {
                 continue;
+            }
 
             int index = i;
             UnityAction moveAction = movePair.Key;
@@ -191,7 +196,9 @@ public class CombatUIHandler : MonoBehaviour
             _movesetButtonText[index].text = moveData.ActionName;
 
             if (i == 0)
+            {
                 _eventSystem.SetSelectedGameObject(_movesetSelections[i]);
+            }
         }
 
         PlayerPrefs.Save();
@@ -199,8 +206,6 @@ public class CombatUIHandler : MonoBehaviour
 
     public void HideSelections()
     {
-        Debug.Log("Hiding action menu");
-
         for (int i = 0; i < _movesetButtons.Count; i++)
         {
             _movesetButtonText[i].text = string.Empty;
@@ -213,6 +218,16 @@ public class CombatUIHandler : MonoBehaviour
 
     public void CheckCurrentTarget(int vectorDirection)
     {
+        UnityAction currentAction = _currentActiveUnit.ActionUsed;
+        if (currentAction != null)
+        {
+            ActionData data = _currentActiveUnit.Moveset[currentAction];
+            if (data.TargetType == TargetType.Self)
+            {
+                return;
+            }
+        }
+
         List<GameObject> currentList;
         List<Slider> currentHealthBars;
         int step;
@@ -250,8 +265,6 @@ public class CombatUIHandler : MonoBehaviour
 
             nextIndex = nextIndex + step;
         }
-
-        Debug.Log("No valid targets found in that direction.");
     }
 
     public void ShowCurrentIndicator()
@@ -260,53 +273,94 @@ public class CombatUIHandler : MonoBehaviour
         {
             GetValidTarget();
             if (_currentTargetedPosition == null)
+            {
                 return;
+            }
         }
 
-        _currentTargetIndicator = _currentTargetedPosition.GetComponent<SpriteRenderer>();
+        _currentTargetIndicator = _currentTargetedPosition.GetComponentInChildren<SpriteRenderer>();
 
         if (_currentTargetIndicator != null)
         {
             _currentTargetIndicator.enabled = true;
-            Debug.Log("INDICATOR ENABLED");
         }
     }
 
     protected void GetValidTarget()
     {
-        bool isAllyTargeting = CombatFunctions.IsAllyTargeting(_currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].ActionCategory,
-        _currentActiveUnit.Moveset[_currentActiveUnit.ActionUsed].StatusCategory);
+        UnityAction currentAction = _currentActiveUnit.ActionUsed;
 
-        if (isAllyTargeting == false)
+        if (currentAction == null)
         {
-            for (int i = 0; i < _enemySpawnPos.Count; i++)
-            {
-                if (_enemyHealthbars[i].gameObject.activeSelf == true)
-                {
-                    _currentTargetedPosition = _enemySpawnPos[i];
-                    break;
-                }
-            }
+            return;
+        }
 
-            _markedTargetIndicators = _enemyMarkedTargetIndicator;
-            Debug.Log("Not ally targeting move - finding first living enemy");
+        ActionData currentActionData = _currentActiveUnit.Moveset[currentAction];
+
+        List<GameObject> targetSpawnList;
+        List<Slider> targetHealthBars;
+        bool isAllyTargeting = CombatFunctions.IsAllyTargeting(currentActionData.ActionCategory, currentActionData.StatusCategory);
+
+        if (isAllyTargeting)
+        {
+            targetSpawnList = _playerSpawnPos;
+            targetHealthBars = _playerHealthbars;
+            _markedTargetIndicators = _playerMarkedTargetIndicator;
         }
         else
         {
-            for (int i = 0; i < _playerSpawnPos.Count; i++)
-            {
-                if (_playerHealthbars[i].gameObject.activeSelf == true)
-                {
-                    _currentTargetedPosition = _playerSpawnPos[i];
-                    break;
-                }
-            }
-
-            _markedTargetIndicators = _playerMarkedTargetIndicator;
-            Debug.Log("Ally targeting move - finding first living player");
+            targetSpawnList = _enemySpawnPos;
+            targetHealthBars = _enemyHealthbars;
+            _markedTargetIndicators = _enemyMarkedTargetIndicator;
         }
 
-        Debug.Log(_currentTargetedPosition);
+        switch (currentActionData.TargetType)
+        {
+            case TargetType.Self:
+                if (_currentActiveUnit.IsPlayer)
+                {
+                    _currentTargetedPosition = _playerSpawnPos[_currentActiveUnit.SpawnIndex];
+                    _markedTargetIndicators = _playerMarkedTargetIndicator;
+                }
+                else
+                {
+                    _currentTargetedPosition = _enemySpawnPos[_currentActiveUnit.SpawnIndex];
+                    _markedTargetIndicators = _enemyMarkedTargetIndicator;
+                }
+                break;
+
+            case TargetType.Single:
+                SelectFirstLivingTarget(targetSpawnList, targetHealthBars);
+                break;
+
+            case TargetType.MultiSingle:
+                SelectFirstLivingTarget(targetSpawnList, targetHealthBars);
+                break;
+
+            case TargetType.Burst:
+                SelectFirstLivingTarget(targetSpawnList, targetHealthBars);
+                break;
+
+            case TargetType.FullAOE:
+                SelectFirstLivingTarget(targetSpawnList, targetHealthBars);
+                break;
+
+            default:
+                SelectFirstLivingTarget(targetSpawnList, targetHealthBars);
+                break;
+        }
+    }
+
+    private void SelectFirstLivingTarget(List<GameObject> spawns, List<Slider> bars)
+    {
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            if (bars[i].gameObject.activeSelf)
+            {
+                _currentTargetedPosition = spawns[i];
+                break;
+            }
+        }
     }
 
     public void HideCurrentIndicator()
@@ -322,16 +376,33 @@ public class CombatUIHandler : MonoBehaviour
 
     public void SaveSelectedTargets()
     {
+        if (_currentTargetedPosition == null)
+        {
+            return;
+        }
+
         Unit targetedUnit = _currentTargetedPosition.GetComponentInChildren<Unit>();
 
         if (targetedUnit != null)
         {
             _battleHandler.TargetedUnits.Add(targetedUnit);
 
-            int index = targetedUnit.SpawnIndex;
-            SpriteRenderer markedTargetIndicator = _markedTargetIndicators[index];
+            // Identify which list to use based on the unit being targeted
+            List<SpriteRenderer> activeIndicators = targetedUnit.IsPlayer ? _playerMarkedTargetIndicator : _enemyMarkedTargetIndicator;
 
-            Debug.Log($"Target Saved: {targetedUnit.name}. Total Hits queued: {_battleHandler.TargetedUnits.Count}");
+            int index = targetedUnit.SpawnIndex;
+
+            if (index < 0 || index >= activeIndicators.Count)
+            {
+                return;
+            }
+
+            SpriteRenderer markedTargetIndicator = activeIndicators[index];
+
+            if (markedTargetIndicator == null)
+            {
+                return;
+            }
 
             if (markedTargetIndicator.enabled)
             {
@@ -339,24 +410,45 @@ public class CombatUIHandler : MonoBehaviour
 
                 if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
                 {
-                    Debug.Log("Changing mark");
                     markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
                 }
             }
             else
             {
-                markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
-                markedTargetIndicator.enabled = true;
+                if (_currentActiveUnit.UnitData.MarkedTargetIndicators.Count > 0)
+                {
+                    markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
+                    markedTargetIndicator.enabled = true;
+                }
             }
         }
     }
-
     public void ResetTargetsIndicators()
     {
-        for (int i = 0; i < _markedTargetIndicators.Count; i++)
+        // Reset Player Indicators
+        if (_playerMarkedTargetIndicator != null)
         {
-            _markedTargetIndicators[i].enabled = false;
-            _markedTargetIndicators[i].sprite = null;
+            foreach (var indicator in _playerMarkedTargetIndicator)
+            {
+                if (indicator != null)
+                {
+                    indicator.enabled = false;
+                    indicator.sprite = null;
+                }
+            }
+        }
+
+        // Reset Enemy Indicators
+        if (_enemyMarkedTargetIndicator != null)
+        {
+            foreach (var indicator in _enemyMarkedTargetIndicator)
+            {
+                if (indicator != null)
+                {
+                    indicator.enabled = false;
+                    indicator.sprite = null;
+                }
+            }
         }
     }
 
@@ -366,7 +458,6 @@ public class CombatUIHandler : MonoBehaviour
         {
             if (i < _battleHandler.ActiveUnits.Count)
             {
-                Debug.Log("Updating Turn Display");
                 Unit unit = _battleHandler.ActiveUnits[i];
                 _turnValueText[i].text = $"{unit.name} TV: {unit.CurrentTurnValue}";
             }

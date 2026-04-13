@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccfa9c5d9abb7394688060f157e7c884, type: 3}
   m_Name: EnemyCrewmateUnitData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
+  UnitPrefab: {fileID: 1774595079029614055, guid: c8811759bc61e4646a31ce0a2c43a54b, type: 3}
   MaxHealthPoints: 20
   MaxResolvePoints: 10
   BaseSpeed: 5
-  BaseDamage: 8
+  BaseDamage: 3
   CharacterSprite: {fileID: -147883733820336173, guid: 6b68e435b9654014899ac0ec6c66c8f5, type: 3}
   CharacterIcons: []
   MarkedTargetIndicators:

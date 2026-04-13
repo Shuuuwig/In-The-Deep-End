@@ -44,12 +44,23 @@ public static class TurnFunctions
                 enemyAlive = true;
         }
 
-        if (!playerAlive || !enemyAlive)
+        if (!enemyAlive)
         {
             // change to victory ui later
+            foreach (Unit unit in activeUnits)
+            {
+                if (unit.IsPlayer)
+                {
+                    unit.SaveBattleStats();
+                }
+            }
             mapData.AdvanceRow();
             SceneHandler.GoToMap();
             return;
+        }
+        else if (!playerAlive)
+        {
+            SceneHandler.GameOver();
         }
 
         float turnValuePassed = activeUnits[1].CurrentTurnValue;

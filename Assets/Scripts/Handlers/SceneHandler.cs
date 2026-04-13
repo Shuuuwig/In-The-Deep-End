@@ -15,6 +15,12 @@ public class SceneHandler : MonoBehaviour
         Debug.Log("To Map");
     }
 
+    public static void GameOver()
+    {
+        SceneManager.LoadScene(3);
+        Debug.Log("GameOver");
+    }
+
     public void QuitGame()
     {
         Application.Quit();
