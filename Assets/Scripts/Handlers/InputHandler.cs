@@ -25,22 +25,26 @@ public class InputHandler : MonoBehaviour
         _navigateMovesetAction = inputActionsUnity.FindAction("UI/Navigate");
         _confirmAction = inputActionsUnity.FindAction("UI/Submit");
         _earlyEndAction = inputActionsUnity.FindAction("UI/EarlyEnd");
-        _cancelAction = inputActionsUnity.FindAction("UI/Cancel");
+        _cancelAction = inputActionsUnity.FindAction("UI/CancelAction");
         _counterAction = inputActionsUnity.FindAction("UI/Counter");
     }
 
     void OnEnable()
     {
         _navigateMovesetAction.Enable();
-        // foreach (var action in _fireActions)
-        //     action.Enable();
+        _confirmAction.Enable();
+        _earlyEndAction.Enable();
+        _cancelAction.Enable();
+        _counterAction.Enable();
     }
 
     void OnDisable()
     {
         _navigateMovesetAction.Disable();
-        // foreach (var action in _fireActions)
-        //     action.Disable();
+        _confirmAction.Disable();
+        _earlyEndAction.Disable();
+        _cancelAction.Disable();
+        _counterAction.Disable();
     }
 
     void Update()

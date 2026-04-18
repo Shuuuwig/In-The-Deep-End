@@ -7,7 +7,8 @@ public class BattleHandler : StateMachine
     [Header("Room Data")]
     [SerializeField] protected RoomData _currentRoomData;
     [SerializeField] protected MapData _mapData;
-    protected TeamData _teamData;
+    [SerializeField] protected TeamData _teamData;
+    [SerializeField] private AudioClip _battleMusic;
     [SerializeField] protected List<BattleData> _tier1Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> _tier2Battle = new List<BattleData>();
     [SerializeField] protected List<BattleData> _tier3Battle = new List<BattleData>();
@@ -45,6 +46,7 @@ public class BattleHandler : StateMachine
 
     void Start()
     {
+        AudioHandler.Instance.PlayMusic(_battleMusic, true);
         InitializeBattle();
         CombatFunctions.Initialize(_combatUIHandler);
     }
@@ -117,6 +119,7 @@ public class BattleHandler : StateMachine
         _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
 
         _combatUIHandler.InitializeHealthDisplay();
+        _combatUIHandler.InitializeUnitDetails();
 
         ChangeState<InitialTurnState>();
     }
@@ -148,9 +151,7 @@ public class BattleHandler : StateMachine
 
     public void NextUnitTurn()
     {
-
-        TurnFunctions.UpdateTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag,
-                _playerGraveyard, _enemyGraveyard, _mapData);
+        TurnFunctions.UpdateTurnValue(_activeUnits, _playerUnitTag, _enemyUnitTag, _mapData, _teamData);
         _activeUnits = TurnFunctions.SortActiveUnits(_activeUnits);
         UnitTurn();
     }

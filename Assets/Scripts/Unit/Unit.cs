@@ -38,18 +38,13 @@ public abstract class Unit : MonoBehaviour
     public int CurrentActionCount;
 
     [Header("Cached Assets")]
-    [HideInInspector] public AnimationClip DefaultIdleClip;
-    [HideInInspector] public AnimationClip AttackAnimation;
-    [HideInInspector] public AnimationClip TakenDamage;
-    [HideInInspector] public AudioClip DamageSound;
-    [HideInInspector] public AudioClip TakenDamageSound;
+    public AudioClip CurrentSoundClip;
 
     protected int _maxActionCount;
     protected float _baseTurnValue;
     public float BaseTurnValue => _baseTurnValue;
     public int MaxActionCount => _maxActionCount;
 
-    protected List<AudioClip> _audioClips => _unitData.AudioClips;
     protected List<AnimationClip> _animationClips => _unitData.AnimationClips;
 
     public virtual bool IsDead()
@@ -59,11 +54,6 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void Awake()
     {
-        if (_animationClips != null && _animationClips.Count > 0)
-        {
-            DefaultIdleClip = _animationClips[0];
-        }
-
         UpdateMoveset();
     }
 
@@ -149,10 +139,11 @@ public abstract class Unit : MonoBehaviour
     }
 
     protected abstract void UpdateMoveset();
-    protected abstract void UnitUniqueUI();
+    public abstract void UnitDetails(GameObject detailsPosition);
     public abstract void CheckActionCount();
     public abstract void ResetActionCount();
     public abstract void PlanStateInitialResources();
+    public abstract void PlanStateResetActionCount();
     public abstract void StatusCheck();
     public abstract bool CanCounter();
     public abstract void Countered(object sender, InfoEventArgs<bool> e);

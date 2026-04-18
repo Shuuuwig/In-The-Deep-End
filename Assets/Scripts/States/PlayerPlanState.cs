@@ -11,7 +11,7 @@ public class PlayerPlanState : PlanState
         InputHandler.NavigateMovesetEvent += OnNavigateMoveset;
         InputHandler.ConfirmActionEvent += OnConfirmAction;
         InputHandler.EarlyEndActionEvent += OnEarlyEnd;
-        InputHandler.CancelActionEvent += OnCancelAction;
+        //InputHandler.CancelActionEvent += OnCancelAction;
     }
 
     protected override void RemoveListeners()
@@ -20,7 +20,7 @@ public class PlayerPlanState : PlanState
         InputHandler.NavigateMovesetEvent -= OnNavigateMoveset;
         InputHandler.ConfirmActionEvent -= OnConfirmAction;
         InputHandler.EarlyEndActionEvent -= OnEarlyEnd;
-        InputHandler.CancelActionEvent -= OnCancelAction;
+        //InputHandler.CancelActionEvent -= OnCancelAction;
     }
 
     protected void OnNavigateMoveset(object sender, InfoEventArgs<int> e)
@@ -38,25 +38,25 @@ public class PlayerPlanState : PlanState
         }
     }
 
-    protected void OnCancelAction(object sender, InfoEventArgs<bool> e)
-    {
-        if (e.info == true)
-        {
-            _currentActiveUnit.CurrentActionCount = 0;
+    // protected void OnCancelAction(object sender, InfoEventArgs<bool> e)
+    // {
+    //     if (e.info == true)
+    //     {
+    //         _currentActiveUnit.CurrentActionCount = 0;
 
-            _currentActiveUnit.ResetActionCount();
-            _currentActiveUnit.ClearAction();
+    //         _currentActiveUnit.PlanStateResetActionCount();
+    //         _currentActiveUnit.ClearAction();
 
-            CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);
+    //         CombatFunctions.ClearSelectedTargets(_battleHandler.TargetedUnits);
 
-            _combatUIHandler.HideCurrentIndicator();
-            _combatUIHandler.ResetTargetsIndicators();
+    //         _combatUIHandler.HideCurrentIndicator();
+    //         _combatUIHandler.ResetTargetsIndicators();
 
-            Debug.Log("Target Canceled - Returning to Move Selection");
+    //         Debug.Log("Target Canceled - Returning to Move Selection");
 
-            LoadSelections();
-        }
-    }
+    //         LoadSelections();
+    //     }
+    // }
 
     protected void OnConfirmAction(object sender, InfoEventArgs<bool> e)
     {

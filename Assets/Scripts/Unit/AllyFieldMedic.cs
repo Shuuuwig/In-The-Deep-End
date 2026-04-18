@@ -7,17 +7,17 @@ public class AllyFieldMedic : Unit
         base.InitializeUnit();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
     {
         _moveset.Clear();
         _moveset.Add(Saw, _actionDatas[0]);
-
+        _moveset.Add(Aid, _actionDatas[1]);
+        _moveset.Add(WideAid, _actionDatas[2]);
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
 
     }
@@ -35,6 +35,11 @@ public class AllyFieldMedic : Unit
     public override void PlanStateInitialResources()
     {
 
+    }
+
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
     }
 
     public override void ClearAction()
@@ -60,6 +65,8 @@ public class AllyFieldMedic : Unit
     protected void Saw()
     {
         ActionUsed = Saw;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
+
         _maxActionCount = _actionDatas[0].MaxActionCount;
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
     }
@@ -67,5 +74,18 @@ public class AllyFieldMedic : Unit
     protected void Aid()
     {
         ActionUsed = Aid;
+        CurrentSoundClip = _actionDatas[1].SoundClip;
+
+        _maxActionCount = _actionDatas[0].MaxActionCount;
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
+    }
+
+    protected void WideAid()
+    {
+        ActionUsed = WideAid;
+        CurrentSoundClip = _actionDatas[2].SoundClip;
+
+        _maxActionCount = _actionDatas[0].MaxActionCount;
+        CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
     }
 }

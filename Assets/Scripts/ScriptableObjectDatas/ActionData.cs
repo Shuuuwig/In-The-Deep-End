@@ -6,6 +6,7 @@ using UnityEngine;
 public class ActionData : ScriptableObject
 {
     public string ActionName;
+    public AudioClip SoundClip;
     public ActionCategory ActionCategory;
     public TargetType TargetType;
     [Range(0, 10)] public int MaxActionCount;

@@ -7,7 +7,6 @@ public class EnemyMusketman : Unit
         base.InitializeUnit();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
@@ -17,7 +16,7 @@ public class EnemyMusketman : Unit
 
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
 
     }
@@ -34,7 +33,12 @@ public class EnemyMusketman : Unit
 
     public override void PlanStateInitialResources()
     {
-        
+
+    }
+
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
     }
 
     public override void ClearAction()
@@ -60,6 +64,8 @@ public class EnemyMusketman : Unit
     protected void Fire()
     {
         ActionUsed = Fire;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
+
         _maxActionCount = _actionDatas[0].MaxActionCount;
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
 

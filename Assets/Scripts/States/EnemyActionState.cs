@@ -33,7 +33,7 @@ public class EnemyActionState : ActionState
             Debug.Log($"{_battleHandler.TargetedUnits[0]} CAN COUNTER");
             _combatUIHandler.ShowCounterPrompt();
             AddListeners();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
             _combatUIHandler.HideCounterPrompt();
             RemoveListeners();
         }

@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: AidActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Aid
+  SoundClip: {fileID: 8300000, guid: 86e2018536ad52a4f9812dc804206b44, type: 3}
   ActionCategory: 1
-  TargetType: 0
+  TargetType: 1
   MaxActionCount: 1
   StatusCategory: 0
-  PowerMultiplier: 0
+  PowerMultiplier: 7
   Accuracy: 100

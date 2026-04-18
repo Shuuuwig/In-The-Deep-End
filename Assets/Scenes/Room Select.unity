@@ -503,21 +503,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c067db2d02d69b940a9ac9964b3150e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapHandler
+  _eventSystem: {fileID: 1705943015}
   _rows:
-  - {fileID: 1730659027}
-  - {fileID: 1986476621}
-  - {fileID: 1124496095}
-  - {fileID: 1059872933}
   - {fileID: 495270794}
+  - {fileID: 1059872933}
+  - {fileID: 1124496095}
+  - {fileID: 1986476621}
+  - {fileID: 1730659027}
   _roomSelectionPrefab: {fileID: 3761602012796187840, guid: 522361dc0432c1747919fd51c286ea21, type: 3}
   _mapData: {fileID: 11400000, guid: 86a0e46a38de2ac42872d9abfdb4435d, type: 2}
+  _teamData: {fileID: 11400000, guid: 7e64177f8ce40e5488e71402926c6b17, type: 2}
   _combatData: {fileID: 11400000, guid: 425e86421ed487c4190cfd4cae06abcb, type: 2}
   _eventData: {fileID: 11400000, guid: 8db239c7c000d4040bd5ce06b35187d2, type: 2}
   _restData: {fileID: 11400000, guid: 40ae76179b4d18e4caf1b166715eafa0, type: 2}
+  _mapMusic: {fileID: 8300000, guid: 8346d35ff35c0c1499a9f35375840151, type: 3}
   _masterSeed: 0
   _noiseScale: 0.3
   _combatRoomSpawnChance: 0.7
-  _eventRoomSpawnChance: 0.25
+  _eventRoomSpawnChance: 0.3
   _extraPathChance: 0.3
   _linePrefab: {fileID: 908677606806369841, guid: 52a3aac15455f024d9b013b55f11ea22, type: 3}
   _lineParent: {fileID: 632439500}
@@ -885,7 +888,7 @@ MonoBehaviour:
   m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_DeselectOnBackgroundClick: 1
+  m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6

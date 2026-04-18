@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 
 [CreateAssetMenu(fileName = "TeamData", menuName = "ScriptableObjects / TeamData")]
 public class TeamData : ScriptableObject
@@ -24,6 +25,11 @@ public class TeamData : ScriptableObject
         }
         PlayerPrefs.Save();
         Debug.Log("TeamData: Team composition saved to disk.");
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+        AssetDatabase.SaveAssets();
+#endif
     }
 
     public void LoadTeam()
@@ -53,8 +59,34 @@ public class TeamData : ScriptableObject
             UnitsInParty[i] = null;
             PlayerPrefs.DeleteKey(TEAM_KEY_PREFIX + i);
         }
-        
+
         PlayerPrefs.Save();
         Debug.Log("TeamData: Team cleared and Save Data deleted.");
+    }
+
+    public void SortTeamAfterDeath()
+    {
+        // 1. Filter the list
+        UnitsInParty.RemoveAll(unitGO =>
+        {
+            if (unitGO == null) return true;
+
+            Unit unitScript = unitGO.GetComponent<Unit>();
+
+            if (unitScript == null || unitScript.UnitData.CurrentHealthPoints <= 0)
+            {
+                return true;
+            }
+
+            return false;
+        });
+
+        while (UnitsInParty.Count < 4)
+        {
+            UnitsInParty.Add(null);
+        }
+
+        SaveTeam();
+        Debug.Log("TeamData: Survivors shifted forward and saved.");
     }
 }

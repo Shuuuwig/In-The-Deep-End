@@ -10,8 +10,10 @@ public class MainMenuHandler : MonoBehaviour
     [SerializeField] EventSystem _eventSystem;
     [SerializeField] MapData _mapData;
     [SerializeField] TeamData _teamData;
+    [SerializeField] AudioClip _mainMenuMusic;
+    [SerializeField] RoomData _prepRoomData;
 
-    void Awake()
+    void Start()
     {
         if (_eventSystem == null)
         {
@@ -52,6 +54,8 @@ public class MainMenuHandler : MonoBehaviour
             _continueButton.interactable = false;
             _eventSystem.SetSelectedGameObject(_newGameButton.gameObject);
         }
+
+        AudioHandler.Instance.PlayMusic(_mainMenuMusic, true);
     }
 
     void LoadMapDataFromPrefs()
@@ -75,16 +79,23 @@ public class MainMenuHandler : MonoBehaviour
     public void ResetProgress()
     {
         _mapData.ResetProgress();
+
+        // 1. Reset the stats of the current units BEFORE clearing the list
         foreach (GameObject prefab in _teamData.UnitsInParty)
         {
             if (prefab != null)
             {
-                UnitData data = prefab.GetComponent<Unit>().UnitData;
-                data.ResetCurrentStats();
-                Debug.Log("RESET STATS");
+                Unit unitScript = prefab.GetComponent<Unit>();
+                if (unitScript != null && unitScript.UnitData != null)
+                {
+                    unitScript.UnitData.ResetCurrentStats();
+                    Debug.Log($"Stats reset for: {unitScript.UnitData.name}");
+                }
             }
         }
-        _teamData.ResetTeam();
 
+        _teamData.ResetTeam();
+        
+        SceneHandler.GoToRoom(_prepRoomData);
     }
 }

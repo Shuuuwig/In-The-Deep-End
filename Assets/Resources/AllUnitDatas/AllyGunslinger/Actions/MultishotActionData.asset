@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MultishotActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Multishot
+  SoundClip: {fileID: 8300000, guid: 206bcac97a4f8674aa00a6960e91b462, type: 3}
   ActionCategory: 0
   TargetType: 2
   MaxActionCount: 6

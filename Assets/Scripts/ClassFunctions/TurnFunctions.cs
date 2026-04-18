@@ -29,7 +29,7 @@ public static class TurnFunctions
     }
 
     public static void UpdateTurnValue(List<Unit> activeUnits, string playerUnitTag, string enemyUnitTag,
-                                    GameObject playerGraveyard, GameObject enemyGraveyard, MapData mapData)
+                                    MapData mapData, TeamData teamData)
     {
         activeUnits = SortActiveUnits(activeUnits);
 
@@ -54,8 +54,20 @@ public static class TurnFunctions
                     unit.SaveBattleStats();
                 }
             }
+            teamData.SortTeamAfterDeath();
             mapData.AdvanceRow();
-            SceneHandler.GoToMap();
+
+            if (mapData.CurrentRow >= mapData.NumberOfRows - 1)
+            {
+                Debug.Log("Final Boss Defeated! Game Over - Victory.");
+                SceneHandler.GameOver();
+            }
+            else
+            {
+                Debug.Log($"Moving to Map. Current Row: {mapData.CurrentRow}");
+                SceneHandler.GoToMap();
+            }
+
             return;
         }
         else if (!playerAlive)

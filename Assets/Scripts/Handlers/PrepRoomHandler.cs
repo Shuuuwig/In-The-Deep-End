@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class TeamHandler : MonoBehaviour
+public class PrepRoomHandler : MonoBehaviour
 {
     [SerializeField] protected TeamData _teamData;
     [SerializeField] protected List<GameObject> _positionSlots = new List<GameObject>();

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SawActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Saw
+  SoundClip: {fileID: 8300000, guid: af90d3e4621cf554eb982940be44d177, type: 3}
   ActionCategory: 0
   TargetType: 1
   MaxActionCount: 1

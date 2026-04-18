@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ReloadActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Reload
+  SoundClip: {fileID: 8300000, guid: 706715467148d3d4981a3e6e395f98ab, type: 3}
   ActionCategory: 2
   TargetType: 0
   MaxActionCount: 1

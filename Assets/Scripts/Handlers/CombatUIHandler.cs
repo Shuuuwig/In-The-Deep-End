@@ -99,6 +99,19 @@ public class CombatUIHandler : MonoBehaviour
         }
     }
 
+    public void InitializeUnitDetails()
+    {
+        foreach (Unit unit in _battleHandler.ActiveUnits)
+        {
+            int index = unit.SpawnIndex;
+
+            if (unit.IsPlayer)
+            {
+                unit.UnitDetails(_playerHealthbars[index].gameObject);
+            }
+        }
+    }
+
     private void SetupHealthSlider(Slider slider, Unit unit)
     {
         slider.maxValue = unit.MaxHealthPoints;
@@ -376,53 +389,77 @@ public class CombatUIHandler : MonoBehaviour
 
     public void SaveSelectedTargets()
     {
-        if (_currentTargetedPosition == null)
+        if (_currentTargetedPosition == null) return;
+
+        Unit primaryTarget = _currentTargetedPosition.GetComponentInChildren<Unit>();
+        if (primaryTarget == null) return;
+
+        UnityAction currentAction = _currentActiveUnit.ActionUsed;
+        ActionData currentActionData = _currentActiveUnit.Moveset[currentAction];
+
+        List<GameObject> spawnList = primaryTarget.IsPlayer ? _playerSpawnPos : _enemySpawnPos;
+        List<Slider> healthBars = primaryTarget.IsPlayer ? _playerHealthbars : _enemyHealthbars;
+        List<SpriteRenderer> activeIndicators = primaryTarget.IsPlayer ? _playerMarkedTargetIndicator : _enemyMarkedTargetIndicator;
+
+        int primaryIndex = primaryTarget.SpawnIndex;
+
+        if (currentActionData.TargetType == TargetType.FullAOE)
         {
-            return;
+            for (int i = 0; i < spawnList.Count; i++)
+            {
+                ProcessTargetAtIndex(i, spawnList, healthBars, activeIndicators);
+            }
         }
-
-        Unit targetedUnit = _currentTargetedPosition.GetComponentInChildren<Unit>();
-
-        if (targetedUnit != null)
+        else if (currentActionData.TargetType == TargetType.Burst)
         {
-            _battleHandler.TargetedUnits.Add(targetedUnit);
+            ProcessTargetAtIndex(primaryIndex - 1, spawnList, healthBars, activeIndicators);
+            ProcessTargetAtIndex(primaryIndex, spawnList, healthBars, activeIndicators);
+            ProcessTargetAtIndex(primaryIndex + 1, spawnList, healthBars, activeIndicators);
+        }
+        else
+        {
+            ProcessTargetAtIndex(primaryIndex, spawnList, healthBars, activeIndicators);
+        }
+    }
 
-            // Identify which list to use based on the unit being targeted
-            List<SpriteRenderer> activeIndicators = targetedUnit.IsPlayer ? _playerMarkedTargetIndicator : _enemyMarkedTargetIndicator;
+    private void ProcessTargetAtIndex(int index, List<GameObject> spawnList, List<Slider> healthBars, List<SpriteRenderer> indicators)
+    {
+        if (index < 0 || index >= spawnList.Count) return;
 
-            int index = targetedUnit.SpawnIndex;
-
-            if (index < 0 || index >= activeIndicators.Count)
+        if (healthBars[index].gameObject.activeSelf)
+        {
+            Unit unit = spawnList[index].GetComponentInChildren<Unit>();
+            if (unit != null)
             {
-                return;
-            }
+                _battleHandler.TargetedUnits.Add(unit);
 
-            SpriteRenderer markedTargetIndicator = activeIndicators[index];
-
-            if (markedTargetIndicator == null)
-            {
-                return;
-            }
-
-            if (markedTargetIndicator.enabled)
-            {
-                int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(markedTargetIndicator.sprite);
-
-                if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
-                {
-                    markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
-                }
-            }
-            else
-            {
-                if (_currentActiveUnit.UnitData.MarkedTargetIndicators.Count > 0)
-                {
-                    markedTargetIndicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
-                    markedTargetIndicator.enabled = true;
-                }
+                EnableMarkedIndicator(indicators[index]);
             }
         }
     }
+
+    private void EnableMarkedIndicator(SpriteRenderer indicator)
+    {
+        if (indicator == null) return;
+
+        if (!indicator.enabled)
+        {
+            if (_currentActiveUnit.UnitData.MarkedTargetIndicators.Count > 0)
+            {
+                indicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[0];
+                indicator.enabled = true;
+            }
+        }
+        else
+        {
+            int spriteIndex = _currentActiveUnit.UnitData.MarkedTargetIndicators.IndexOf(indicator.sprite);
+            if (spriteIndex + 1 < _currentActiveUnit.UnitData.MarkedTargetIndicators.Count)
+            {
+                indicator.sprite = _currentActiveUnit.UnitData.MarkedTargetIndicators[spriteIndex + 1];
+            }
+        }
+    }
+
     public void ResetTargetsIndicators()
     {
         // Reset Player Indicators

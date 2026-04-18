@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BombardmentActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Bombardment
+  SoundClip: {fileID: 8300000, guid: 700b35c3410131444b5c1d31bd0b68eb, type: 3}
   ActionCategory: 0
   TargetType: 3
   MaxActionCount: 1

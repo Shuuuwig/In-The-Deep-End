@@ -59,6 +59,16 @@ public static class CombatFunctions
         return false;
     }
 
+    public static bool IsBurst(TargetType targetType)
+    {
+        switch (targetType)
+        {
+            case TargetType.Burst:
+                return true;
+        }
+        return false;
+    }
+
     private static CombatUIHandler _combatUIHandler;
 
     public static void Initialize(CombatUIHandler combatUIHandler)
@@ -68,11 +78,13 @@ public static class CombatFunctions
 
     public static BattleData SelectBattleData(List<BattleData> tier1Battle, List<BattleData> tier2Battle, List<BattleData> tier3Battle, MapData mapData)
     {
-        if (mapData.CurrentRow <= 2)
-            return tier1Battle[Random.Range(0, tier1Battle.Count)];
-        else if (mapData.CurrentRow < mapData.NumberOfRows)
-            return tier2Battle[Random.Range(0, tier2Battle.Count)];
-        return tier3Battle[Random.Range(0, tier3Battle.Count)];
+        // Initialize the random state to the current time to ensure a unique seed per session
+        Random.InitState((int)System.DateTime.Now.Ticks);
+
+        Debug.Log($"Selecting Battle for Row: {mapData.CurrentRow}. Total Rows: {mapData.NumberOfRows}");
+
+        int index = Random.Range(0, tier1Battle.Count);
+            return tier1Battle[index];
     }
 
     public static void ResetActionCount(Unit currentActiveUnit)
@@ -96,41 +108,74 @@ public static class CombatFunctions
     {
         for (int index = 0; index < targets.Count; index++)
         {
-            if (targets[index].IsDead()) //in case of multiple hits on same target and already died
+            if (targets[index].IsDead())
                 continue;
 
+            // 1. Play Attacker's sound (e.g., Gunshot or Sword Swing)
+            if (self.CurrentSoundClip != null)
+                AudioHandler.Instance.PlaySoundOneShot(self.CurrentSoundClip);
+
             targets[index].CurrentHealthPoints -= self.CurrentDamage;
-            Debug.Log($"Now targeting: {targets[index]}");
-            Debug.Log($"Health now: {targets[index].CurrentHealthPoints}");
 
             _combatUIHandler.UpdateHealthDisplay(targets);
 
-            // AudioHandler.PlaySound(self.AudioSource, self.DamageSound);
-            // AnimationHandler.PlayAnimation(self.Animator, self.AttackAnimation);
-
-            // AudioHandler.PlaySound(targets[index].AudioSource, targets[index].TakenDamageSound);
-            // AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].AttackAnimation);
+            // 2. Play Target's "Hit" sound (if your Unit class has a HitSound property)
+            // AudioHandler.Instance.PlaySoundOneShot(targets[index].HitSound);
 
             yield return new WaitForSeconds(0.2f);
-
-            // float animationLength = targets[index].Animator.GetCurrentAnimatorStateInfo(0).length;
-
-            // yield return new WaitForSeconds(animationLength);
-
-            // AnimationHandler.PlayAnimation(self.Animator, self.DefaultIdleClip);
-            // AnimationHandler.PlayAnimation(targets[index].Animator, targets[index].DefaultIdleClip);
         }
     }
 
-    public static IEnumerator Damage(Unit self, List<StatusEffect> statusEffects)
+    public static IEnumerator BurstDamage(Unit self, List<Unit> targets)
     {
-        for (int index = 0; index < statusEffects.Count; index++)
+        // 1. Play Attacker's burst sound once
+        if (self.CurrentSoundClip != null)
+            AudioHandler.Instance.PlaySoundOneShot(self.CurrentSoundClip);
+
+        for (int i = 0; i < targets.Count; i++)
         {
-            statusEffects[index].RunEffect(self);
-            yield return new WaitForSeconds(1f); // change to match anim length
+            if (targets[i] == null || targets[i].IsDead()) continue;
+
+            targets[i].CurrentHealthPoints -= self.CurrentDamage;
+
+            // 2. Optional: Play a "Impact" sound for every individual hit
+            // AudioHandler.Instance.PlaySoundOneShot(targets[i].ImpactSound);
         }
 
-        yield return null;
+        _combatUIHandler.UpdateHealthDisplay(targets);
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    public static IEnumerator Heal(Unit self, List<Unit> targets)
+    {
+        // 1. Play the Caster's healing sound once
+        if (self.CurrentSoundClip != null)
+            AudioHandler.Instance.PlaySoundOneShot(self.CurrentSoundClip);
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (targets[i] == null || targets[i].IsDead()) continue;
+
+            float healAmount = self.CurrentDamage;
+            targets[i].CurrentHealthPoints += healAmount;
+
+            if (targets[i].CurrentHealthPoints > targets[i].MaxHealthPoints)
+            {
+                targets[i].CurrentHealthPoints = targets[i].MaxHealthPoints;
+            }
+
+            // 2. Optional: Individual sparkle/shimmer sound for each unit healed
+            // AudioHandler.Instance.PlaySoundOneShot(targets[i].HealReceiveSound);
+        }
+
+        _combatUIHandler.UpdateHealthDisplay(targets);
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    public static IEnumerator Buff(Unit self, List<Unit> targets)
+    {
+        AudioHandler.Instance.PlaySoundOneShot(self.CurrentSoundClip);
+        yield return new WaitForSeconds(0.5f);
     }
 
     public static void InflictStatusEffect(List<Unit> targets, StatusEffect statusEffect)

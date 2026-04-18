@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   UnitPrefab: {fileID: 8475934905558803381, guid: b47217b4a65bd2d459ece79dd558b01e, type: 3}
   MaxHealthPoints: 18
-  CurrentHealthPoints: 0
+  CurrentHealthPoints: 18
   MaxResolvePoints: 0
   CurrentResolvePoints: 0
   BaseSpeed: 5
-  BaseDamage: 2
+  BaseDamage: 3
   CharacterSprite: {fileID: -7986960153405097925, guid: 3cdb5956865c5784b943aaecc40bc169, type: 3}
   CharacterIcons: []
   MarkedTargetIndicators:
   - {fileID: 4937886267124531071, guid: e5221f6f9f9ad094b9179976bff7a335, type: 3}
-  AudioClips: []
   AnimationClips: []
   ActionDatas:
   - {fileID: 11400000, guid: e9fcc3508798ba14aaba4bcfa6a0c34b, type: 2}
   - {fileID: 11400000, guid: 5020d8662ce70ee4587874e512da084f, type: 2}
+  - {fileID: 11400000, guid: 9b4612ffc9eef2d4da5f004375db9275, type: 2}

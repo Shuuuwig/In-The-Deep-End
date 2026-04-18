@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SlashActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Slash
+  SoundClip: {fileID: 8300000, guid: fa8f7908071971b468422400f06fc89c, type: 3}
   ActionCategory: 0
   TargetType: 1
   MaxActionCount: 1

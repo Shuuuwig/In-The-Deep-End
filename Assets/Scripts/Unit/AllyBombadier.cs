@@ -7,7 +7,6 @@ public class AllyBombadier : Unit
         base.InitializeUnit();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
@@ -16,7 +15,7 @@ public class AllyBombadier : Unit
         _moveset.Add(Bombardment, _actionDatas[0]);
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
 
     }
@@ -34,6 +33,11 @@ public class AllyBombadier : Unit
     public override void PlanStateInitialResources()
     {
 
+    }
+
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
     }
 
     public override void ClearAction()
@@ -59,6 +63,7 @@ public class AllyBombadier : Unit
     protected void Bombardment()
     {
         ActionUsed = Bombardment;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
 
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
         _maxActionCount = _actionDatas[0].MaxActionCount;

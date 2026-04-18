@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86d0a25b3301f5a46a7db3dcb0906a22, type: 3}
   m_Name: AllHandsOnDeckActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
-  ActionName: All Hand On Deck
+  ActionName: All Hands On Deck
   ActionCategory: 2
   TargetType: 4
   MaxActionCount: 0

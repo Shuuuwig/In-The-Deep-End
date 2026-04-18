@@ -25,7 +25,6 @@ public class PlayerGunslingerUnit : Unit
             _canvas = FindAnyObjectByType<Canvas>();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
@@ -51,7 +50,7 @@ public class PlayerGunslingerUnit : Unit
         }
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
         if (_passiveUI == null)
         {
@@ -61,17 +60,34 @@ public class PlayerGunslingerUnit : Unit
         }
 
         RectTransform rect = _passiveUI.GetComponent<RectTransform>();
+        RectTransform canvasRect = _canvas.GetComponent<RectTransform>();
 
-        rect.anchorMin = new Vector2(0, 0);
-        rect.anchorMax = new Vector2(0, 0);
-        rect.pivot = new Vector2(0, 0);
-
-        rect.anchoredPosition = new Vector2(50, 50);
-        rect.sizeDelta = new Vector2(200, 50);
-
-        _ammoNumber.fontSize = 24f;
+        _ammoNumber.fontSize = 12f;
         _ammoNumber.color = Color.white;
         _ammoNumber.alignment = TextAlignmentOptions.BottomLeft;
+
+        // Set anchors to center to make the math more predictable
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(200, 50);
+
+        // 1. Get the Screen Position of the unit
+        Vector2 screenPoint = Camera.main.WorldToScreenPoint(detailsPosition.transform.position);
+
+        // 2. Convert Screen Point to a position local to the Canvas
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            screenPoint,
+            _canvas.worldCamera,
+            out Vector2 localPoint
+        );
+
+        // 3. Apply offsets (Small numbers since this is local UI space)
+        float offsetX = 30f;
+        float offsetY = 50f;
+
+        rect.anchoredPosition = localPoint + new Vector2(offsetX, offsetY);
 
         UpdateAmmoText();
     }
@@ -92,8 +108,15 @@ public class PlayerGunslingerUnit : Unit
     public override void PlanStateInitialResources()
     {
         _savedAmmo = _currentAmmo;
-        _maxActionCount = _savedAmmo;
         Debug.Log($"INITIAL AMMO {_maxActionCount}");
+        UpdateMoveset();
+    }
+
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
+        _currentAmmo = _savedAmmo;
+        UpdateAmmoText();
         UpdateMoveset();
     }
 
@@ -116,6 +139,8 @@ public class PlayerGunslingerUnit : Unit
     {
         Debug.Log("Countered");
         _currentAmmo -= 2;
+        CurrentSoundClip = _actionDatas[1].SoundClip;
+        AudioHandler.Instance.PlaySoundOneShot(CurrentSoundClip);
 
         UpdateAmmoText();
         UpdateMoveset();
@@ -147,6 +172,8 @@ public class PlayerGunslingerUnit : Unit
     protected void Reload()
     {
         ActionUsed = Reload;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
+
         CurrentDamage = 0;
         _maxActionCount = _actionDatas[0].MaxActionCount;
     }
@@ -154,6 +181,7 @@ public class PlayerGunslingerUnit : Unit
     protected void Multishot()
     {
         ActionUsed = Multishot;
+        CurrentSoundClip = _actionDatas[1].SoundClip;
 
         int skillMax = _actionDatas[1].MaxActionCount;
         _maxActionCount = Mathf.Min(_currentAmmo, skillMax);

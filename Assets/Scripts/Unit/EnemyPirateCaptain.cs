@@ -7,7 +7,6 @@ public class EnemyCaptain : Unit
         base.InitializeUnit();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
@@ -16,7 +15,7 @@ public class EnemyCaptain : Unit
         //_moveset.Add(AllHandsOnDeck, _actionDatas[1]);
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
 
     }
@@ -36,6 +35,11 @@ public class EnemyCaptain : Unit
 
     }
 
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
+    }
+
     public override void ClearAction()
     {
         ActionUsed = null;
@@ -45,8 +49,6 @@ public class EnemyCaptain : Unit
     {
 
     }
-
-
 
     public override bool CanCounter()
     {
@@ -61,6 +63,8 @@ public class EnemyCaptain : Unit
     protected void Slash()
     {
         ActionUsed = Slash;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
+
         _maxActionCount = _actionDatas[0].MaxActionCount;
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
     }

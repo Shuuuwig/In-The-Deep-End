@@ -21,11 +21,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Battle Room.unity
     guid: b9418be03852eb740a71f684a8725d3e
   - enabled: 1
-    path: Assets/Scenes/Random Event Room.unity
+    path: Assets/Scenes/Event Room.unity
     guid: ae72e40f6beb07a4094e27d0de7ce38d
-  - enabled: 1
-    path: Assets/Scenes/Rest Room.unity
-    guid: 0e69c73cfca63e545b86ccb0e1c76b4c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

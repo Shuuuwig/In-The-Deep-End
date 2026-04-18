@@ -29,7 +29,7 @@ public class EnemyPlanState : PlanState
     {
         yield return new WaitForSeconds(1f);
         _currentActiveUnit.Moveset.Keys.ElementAt(0).Invoke();
-        int randomNumber = Random.Range(0, 2);
+        int randomNumber = Random.Range(0, 4);
 
         Unit targetedUnit = _battleHandler.PlayerSpawnPos[randomNumber].transform.GetComponentInChildren<Unit>();
 

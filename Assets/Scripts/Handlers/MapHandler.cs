@@ -15,9 +15,11 @@ public class MapHandler : MonoBehaviour
     [Header("Room Prefabs & Data")]
     [SerializeField] GameObject _roomSelectionPrefab;
     [SerializeField] MapData _mapData;
+    [SerializeField] TeamData _teamData;
     [SerializeField] RoomData _combatData;
     [SerializeField] RoomData _eventData;
     [SerializeField] RoomData _restData;
+    [SerializeField] AudioClip _mapMusic;
 
     [Header("Map Generation Settings")]
     [SerializeField] int _masterSeed;
@@ -52,6 +54,11 @@ public class MapHandler : MonoBehaviour
         }
 
         _mapData.NumberOfRows = _rows.Count;
+        if (_mapMusic != null)
+        {
+            AudioHandler.Instance.PlayMusic(_mapMusic, true);
+        }
+
         StartCoroutine(GenerateMapRoutine());
     }
 
@@ -79,7 +86,9 @@ public class MapHandler : MonoBehaviour
 
         GeneratePaths();
         ManageInitialSelections();
-        SnapToBottom();
+
+        float target = 1f - (float)_mapData.CurrentRow / (_rows.Count - 1);
+        StartCoroutine(SmoothFocusRow(target, 0.5f));
     }
 
     public void ManageInitialSelections()
@@ -131,7 +140,17 @@ public class MapHandler : MonoBehaviour
     public void EnterRoom(RoomInfo selectedRoom)
     {
         _mapData.CurrentRoom = selectedRoom.transform.GetSiblingIndex();
+        // No need to increment Row here if your Battle/Event system handles it after victory,
+        // but if you want to look at the NEXT row immediately:
+        int targetRow = Mathf.Min(_mapData.CurrentRow + 1, _rows.Count - 1);
+
         _mapData.SaveProgress();
+
+        // 1. Calculate target based on where the player is GOING
+        float target = 1f - (float)targetRow / (_rows.Count - 1);
+
+        // 2. Start the animation (and remove the instant FocusOnCurrentRow call)
+        StartCoroutine(SmoothFocusRow(target, 0.4f));
 
         foreach (RectTransform row in _rows)
         {
@@ -142,7 +161,7 @@ public class MapHandler : MonoBehaviour
             }
         }
 
-        Debug.Log($"Entered Room {_mapData.CurrentRoom} on Row {_mapData.CurrentRow}. Waiting for victory to advance.");
+        Debug.Log($"Entered Room {_mapData.CurrentRoom} on Row {_mapData.CurrentRow}.");
     }
 
     public void ResetMapProgress()
@@ -272,9 +291,40 @@ public class MapHandler : MonoBehaviour
         newRoom.GetComponent<RoomInfo>().RoomSetup(_mapData, roomData, this);
     }
 
-    void SnapToBottom()
+    IEnumerator SmoothFocusRow(float targetPos, float duration)
     {
-        if (_scrollRect != null)
+        float elapsed = 0;
+        float startPos = _scrollRect.verticalNormalizedPosition;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            _scrollRect.verticalNormalizedPosition = Mathf.Lerp(startPos, targetPos, elapsed / duration);
+            yield return null;
+        }
+        _scrollRect.verticalNormalizedPosition = targetPos;
+    }
+
+    public void FocusOnCurrentRow()
+    {
+        if (_scrollRect == null || _rows.Count <= 1) return;
+
+        // We use the saved CurrentRow index from your MapData
+        int currentRow = _mapData.CurrentRow;
+
+        // If we haven't started yet (-1), focus on the bottom
+        if (currentRow <= 0)
+        {
             _scrollRect.verticalNormalizedPosition = 0f;
+            return;
+        }
+
+        // Calculate the normalized position (0 to 1)
+        // We divide the current row index by the total available gaps between rows
+        float targetNormalizedPos = (float)currentRow / (_rows.Count - 1);
+
+        // If your map scrolls from bottom to top, 0 is the start. 
+        // If it's inverted, you might need (1 - targetNormalizedPos)
+        _scrollRect.verticalNormalizedPosition = targetNormalizedPos;
     }
 }

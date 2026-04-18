@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86d0a25b3301f5a46a7db3dcb0906a22, type: 3}
+  m_Name: CannonFireActionData
+  m_EditorClassIdentifier: Assembly-CSharp::ActionData
+  ActionName: Cannon Fire
+  SoundClip: {fileID: 8300000, guid: 2d5e02bf19787c84b93f5f6225b1c27c, type: 3}
+  ActionCategory: 0
+  TargetType: 3
+  MaxActionCount: 1
+  StatusCategory: 0
+  PowerMultiplier: 1.3
+  Accuracy: 100

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: StrikeActionData
   m_EditorClassIdentifier: Assembly-CSharp::ActionData
   ActionName: Strike
+  SoundClip: {fileID: 8300000, guid: c41dc33fb4f1a014c83e22492550dce8, type: 3}
   ActionCategory: 0
   TargetType: 1
   MaxActionCount: 1

@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 7349858579304240625}
   m_Layer: 0
   m_Name: EnemyCannoneer
-  m_TagString: Untagged
+  m_TagString: EnemyUnit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -288,3 +288,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 404d5e43033848649ae330bf342fa86d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCannoneer
+  _unitData: {fileID: 11400000, guid: 9b70e92e945ef0d4f9b433ee62a37cef, type: 2}
+  _audioSource: {fileID: 4053478405924644381}
+  _animator: {fileID: 4543596120508009051}
+  SpawnIndex: 0
+  IsPlayer: 0
+  _statusEffects: []
+  CurrentHealthPoints: 0
+  CurrentSpeed: 0
+  CurrentDamage: 0
+  CurrentTurnValue: 0
+  CurrentActionCount: 0
+  DefaultIdleClip: {fileID: 0}
+  AttackAnimation: {fileID: 0}
+  TakenDamage: {fileID: 0}
+  DamageSound: {fileID: 0}
+  TakenDamageSound: {fileID: 0}

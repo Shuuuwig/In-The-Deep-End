@@ -7,17 +7,15 @@ public class EnemyCannoneer : Unit
         base.InitializeUnit();
 
         UpdateMoveset();
-        UnitUniqueUI();
     }
 
     protected override void UpdateMoveset()
     {
         _moveset.Clear();
         _moveset.Add(CanonFire, _actionDatas[0]);
-
     }
 
-    protected override void UnitUniqueUI()
+    public override void UnitDetails(GameObject detailsPosition)
     {
 
     }
@@ -34,7 +32,12 @@ public class EnemyCannoneer : Unit
 
     public override void PlanStateInitialResources()
     {
-        
+
+    }
+
+    public override void PlanStateResetActionCount()
+    {
+        CurrentActionCount = 0;
     }
 
     public override void ClearAction()
@@ -46,8 +49,6 @@ public class EnemyCannoneer : Unit
     {
 
     }
-
-
 
     public override bool CanCounter()
     {
@@ -62,8 +63,9 @@ public class EnemyCannoneer : Unit
     protected void CanonFire()
     {
         ActionUsed = CanonFire;
+        CurrentSoundClip = _actionDatas[0].SoundClip;
+
         _maxActionCount = _actionDatas[0].MaxActionCount;
         CurrentDamage = BaseDamage * _actionDatas[0].PowerMultiplier;
-
     }
 }
